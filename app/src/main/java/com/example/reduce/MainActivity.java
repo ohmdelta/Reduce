@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import com.google.mlkit.vision.barcode.Barcode;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
     assert tableView instanceof LinearLayout;
     LinearLayout table = (LinearLayout) tableView;
 
-    for (String s : Main.barcodes ) {
+    for (Barcode barcode : Main.barcodes ) {
       Button button = new Button(this);
-      button.setText(s);
+      button.setText(barcode.getDisplayValue());
       table.addView(button);
     }
   }
