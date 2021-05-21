@@ -5,12 +5,14 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.ToggleButton;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,22 +23,47 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    updateTable();
+
     // get camera permissions
     while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
         == PackageManager.PERMISSION_DENIED) {
       ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, requestCode);
     }
 
-    System.out.println("permission:" +
+/*    System.out.println("permission:" +
         (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
         == PackageManager.PERMISSION_DENIED)
-    );
+    );*/
 
+  }
+
+  public void updateTable() {
+    View tableView =  this.findViewById(R.id.barcodeTable);
+    assert tableView instanceof LinearLayout;
+    LinearLayout table = (LinearLayout) tableView;
+
+    for (String s : Main.barcodes ) {
+      Button button = new Button(this);
+      button.setText(s);
+      table.addView(button);
+    }
   }
 
   // open scanner activity
   public void scan(View view) {
     Intent intent = new Intent(this, ScannerActivity.class);
-    startActivity(intent);
+//    intent.putExtra("BarcodeSet",barcodeSet);
+    startActivityForResult(intent, 1);
   }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+
+    if (resultCode == RESULT_OK) {
+      updateTable();
+    }
+  }
+
 }

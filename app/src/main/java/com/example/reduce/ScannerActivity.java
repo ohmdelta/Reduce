@@ -16,17 +16,30 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 public class ScannerActivity extends AppCompatActivity {
 
-
+  private BarcodeScannerOptions options  =
+      new BarcodeScannerOptions.Builder()
+          .setBarcodeFormats(
+              Barcode.FORMAT_CODE_128,
+              Barcode.FORMAT_QR_CODE)
+          .build();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_scanner);
+
+    Bundle bundle = getIntent().getExtras();
+//    barcodeSet = (Set) bundle.get("BarcodeSet");
+
+    Main.barcodes.add("hi");
 
     while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
         == PackageManager.PERMISSION_DENIED) {
@@ -36,14 +49,19 @@ public class ScannerActivity extends AppCompatActivity {
     startCamera();
 
     View toggle = findViewById(R.id.flashToggle);
-    assert toggle instanceof ToggleButton;
+    toggleFlash(toggle);
+  }
 
-    ToggleButton toggleListener = (ToggleButton) toggle;
 
+  // Camera Functions:
+
+  // Turn on/off Flash
+  private void toggleFlash(View v) {
+    assert v instanceof ToggleButton;
+
+    ToggleButton toggleListener = (ToggleButton) v;
     toggleListener.setOnCheckedChangeListener((buttonView, isChecked) -> {
-
       camera.getCameraControl().enableTorch(isChecked);
-
     });
 
   }
@@ -51,6 +69,8 @@ public class ScannerActivity extends AppCompatActivity {
   private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
   private Camera camera;
 
+
+  // Camera stuff:
   private void startCamera() {
 
     cameraProviderFuture = ProcessCameraProvider.getInstance(this);
@@ -86,13 +106,13 @@ public class ScannerActivity extends AppCompatActivity {
 
   }
 
-  /*private boolean toggle;
+  int n = 0;
+  public void scanBarcode(View view) {
+    Main.barcodes.add("" + n++);
+//    MainActivity.updateTable();
 
-  public void toggleFlashlight(View view) {
-    toggle = !toggle;
-    camera.getCameraControl().enableTorch(toggle);
+    // update MainActivity
+    setResult(RESULT_OK, null);
+  }
 
-//    int toggleButtonId = R.id.flashButton;
-
-  }*/
 }

@@ -17,8 +17,12 @@
     <ScrollView
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            tools:layout_editor_absoluteX="63dp" app:layout_constraintBottom_toBottomOf="parent">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                      android:orientation="vertical"/>
+            tools:layout_editor_absoluteX="63dp" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/scan_button">
+        <LinearLayout
+                android:id="@+id/barcodeTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
