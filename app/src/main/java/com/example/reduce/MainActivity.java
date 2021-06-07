@@ -10,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.mlkit.vision.barcode.Barcode;
 
 import java.util.HashSet;
@@ -37,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         == PackageManager.PERMISSION_DENIED)
     );*/
 
+    MobileAds.initialize(this, initializationStatus -> {
+    });
   }
 
   public void updateTable() {
