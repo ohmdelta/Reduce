@@ -48,10 +48,13 @@ public class MainActivity extends AppCompatActivity {
     View tableView =  this.findViewById(R.id.barcodeTable);
     assert tableView instanceof LinearLayout;
     LinearLayout table = (LinearLayout) tableView;
+    table.removeAllViews();
 
     for (Barcode barcode : Main.barcodes ) {
       Button button = new Button(this);
       button.setText(barcode.getDisplayValue());
+      byte[] b = barcode.getRawBytes();
+
       table.addView(button);
     }
   }
