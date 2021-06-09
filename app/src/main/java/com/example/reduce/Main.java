@@ -10,7 +10,7 @@ import java.util.Set;
 public class Main extends Application {
 
   //TODO: change <String> to <custom.class> for Priority Queue
-  public static HashSet<Barcode> barcodes = new HashSet<>();
+  public static HashSet<customBarcode> barcodes = new HashSet<>();
 
 //  public HashSet<String> barcodes = new HashSet<>();
   

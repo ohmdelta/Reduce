@@ -88,7 +88,9 @@ public class ScannerActivity extends AppCompatActivity {
                     barcodes -> {
                       System.out.println("barcode");
 
-                      Main.barcodes.addAll(barcodes);
+                      for (Barcode b : barcodes) {
+                        Main.barcodes.add(new customBarcode(b));
+                      }
 
                       /*for (Barcode barcode : barcodes) {
                         int valueType = barcode.getValueType();
@@ -142,8 +144,10 @@ public class ScannerActivity extends AppCompatActivity {
                       System.out.println("barcode");
 
                       System.out.println(barcodes);
-                      Main.barcodes.addAll(barcodes);
 
+                      for (Barcode b : barcodes) {
+                        Main.barcodes.add(new customBarcode(b));
+                      }
                       /*for (Barcode barcode : barcodes) {
                         int valueType = barcode.getValueType();
                         switch (valueType) {
