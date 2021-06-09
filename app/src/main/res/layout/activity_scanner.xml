@@ -45,7 +45,8 @@
                   app:layout_constraintTop_toTopOf="@+id/captureButton"
                   app:layout_constraintBottom_toBottomOf="@+id/captureButton"
                   android:id="@+id/ScanToggle"
-                  app:layout_constraintStart_toEndOf="@+id/captureButton" app:layout_constraintEnd_toEndOf="parent"/>
+                  app:layout_constraintStart_toEndOf="@+id/captureButton"
+                  app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.camera.view.PreviewView
             android:id="@+id/cameraView"

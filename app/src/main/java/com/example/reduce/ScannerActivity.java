@@ -13,8 +13,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ToggleButton;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import android.util.Size;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -66,13 +64,13 @@ public class ScannerActivity extends AppCompatActivity {
           @Override
           public void analyze(@NonNull ImageProxy image) {
 
-            System.out.println("analyse");
+//            System.out.println("analyse");
             InputImage inputImage =
                 InputImage.fromMediaImage(
                     Objects.requireNonNull(image.getImage()),
                     image.getImageInfo().getRotationDegrees());
 
-            System.out.println("scan");
+//            System.out.println("scan");
             BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                     .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
@@ -90,10 +88,9 @@ public class ScannerActivity extends AppCompatActivity {
                     barcodes -> {
                       System.out.println("barcode");
 
-                      System.out.println(barcodes);
                       Main.barcodes.addAll(barcodes);
 
-                      for (Barcode barcode : barcodes) {
+                      /*for (Barcode barcode : barcodes) {
                         int valueType = barcode.getValueType();
                         switch (valueType) {
                           case Barcode.FORMAT_QR_CODE:
@@ -110,9 +107,8 @@ public class ScannerActivity extends AppCompatActivity {
                             break;
                           default:
                             //                Main.barcodes.add(barcode);
-                            setResult(RESULT_OK, null);
-                        }
-                      }
+                      */
+//                      setResult(RESULT_OK, null);
                     })
                 .addOnFailureListener(e -> System.out.println("failure"))
                 .addOnCompleteListener(e -> image.close());
@@ -148,7 +144,7 @@ public class ScannerActivity extends AppCompatActivity {
                       System.out.println(barcodes);
                       Main.barcodes.addAll(barcodes);
 
-                      for (Barcode barcode : barcodes) {
+                      /*for (Barcode barcode : barcodes) {
                         int valueType = barcode.getValueType();
                         switch (valueType) {
                           case Barcode.FORMAT_QR_CODE:
@@ -165,7 +161,7 @@ public class ScannerActivity extends AppCompatActivity {
                           default:
                             setResult(RESULT_OK, null);
                         }
-                      }
+                      }*/
                     })
                 .addOnFailureListener(e -> System.out.println("failure"))
                 .addOnCompleteListener(e -> {
@@ -178,8 +174,8 @@ public class ScannerActivity extends AppCompatActivity {
     View toggle = findViewById(R.id.flashToggle);
     toggleFlash(toggle);
 
-    View toggleAnalysis = findViewById(R.id.ScanToggle);
-    toggleAnalysis(toggleAnalysis);
+    View toggleAnalysisButton = findViewById(R.id.ScanToggle);
+    toggleAnalysis(toggleAnalysisButton);
 
   }
 
@@ -188,12 +184,13 @@ public class ScannerActivity extends AppCompatActivity {
     
     ((ToggleButton) toggle).setOnCheckedChangeListener(
         (buttonView, isChecked) -> {
-          View button = findViewById(R.id.scan_button);
+          View button = findViewById(R.id.captureButton);
           assert button instanceof Button;
           ((Button) button).setEnabled(!isChecked);
 
           if (isChecked) {
             analysisOn();
+            setResult(RESULT_OK, null);
           } else {
             analysisOff();
           }

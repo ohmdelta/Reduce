@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     for (Barcode barcode : Main.barcodes ) {
       Button button = new Button(this);
       button.setText(barcode.getDisplayValue());
-      byte[] b = barcode.getRawBytes();
+//      byte[] b = barcode.getRawBytes();
 
       table.addView(button);
     }
