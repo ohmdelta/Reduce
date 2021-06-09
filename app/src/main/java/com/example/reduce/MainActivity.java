@@ -10,10 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.mlkit.vision.barcode.Barcode;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,21 +36,16 @@ public class MainActivity extends AppCompatActivity {
         == PackageManager.PERMISSION_DENIED)
     );*/
 
-    MobileAds.initialize(this, initializationStatus -> {
-    });
   }
 
   public void updateTable() {
     View tableView =  this.findViewById(R.id.barcodeTable);
     assert tableView instanceof LinearLayout;
     LinearLayout table = (LinearLayout) tableView;
-    table.removeAllViews();
 
-    for (Barcode barcode : Main.barcodes ) {
+    for (String s : Main.barcodes ) {
       Button button = new Button(this);
-      button.setText(barcode.getDisplayValue());
-      byte[] b = barcode.getRawBytes();
-
+      button.setText(s);
       table.addView(button);
     }
   }

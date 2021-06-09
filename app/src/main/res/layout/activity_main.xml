@@ -6,18 +6,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity">
-
-    <com.google.android.gms.ads.AdView
-            android:id="@+id/adView"
-            android:layout_width="406dp"
-            android:layout_height="50dp"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-            app:adSize="BANNER"
-            app:adUnitId="ca-app-pub-2863701946465942/9955389565" app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/scrollView2">
-    </com.google.android.gms.ads.AdView>
     <Button
             android:text="@string/scan_button"
             android:layout_width="0dp"
@@ -28,9 +16,9 @@
             android:onClick="scan"/>
     <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="350dp"
+            android:layout_height="400dp"
             tools:layout_editor_absoluteX="63dp" app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/scan_button" android:id="@+id/scrollView2">
+            app:layout_constraintTop_toBottomOf="@+id/scan_button">
         <LinearLayout
                 android:id="@+id/barcodeTable"
                 android:layout_width="match_parent"
