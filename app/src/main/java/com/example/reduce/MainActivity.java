@@ -50,10 +50,10 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout table = (LinearLayout) tableView;
     table.removeAllViews();
 
-    for (Barcode barcode : Main.barcodes ) {
+    for (customBarcode barcode : Main.barcodes ) {
       Button button = new Button(this);
-      button.setText(barcode.getDisplayValue());
-      byte[] b = barcode.getRawBytes();
+      button.setText(barcode.getBarcode().getDisplayValue());
+//      byte[] b = barcode.getRawBytes();
 
       table.addView(button);
     }

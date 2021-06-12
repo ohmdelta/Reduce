@@ -19,7 +19,9 @@
                 android:value="ca-app-pub-2863701946465942~7712369602"
         />
 
-        <activity android:name=".ScannerActivity">
+        <activity android:name=".ScannerActivity"
+                  android:configChanges="orientation"
+                  android:screenOrientation="portrait">
         </activity>
         <activity android:name=".MainActivity"
                   android:configChanges="orientation"

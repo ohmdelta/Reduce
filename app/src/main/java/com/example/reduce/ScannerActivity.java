@@ -2,46 +2,29 @@ package com.example.reduce;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.media.Image;
-import android.os.AsyncTask;
-import android.os.Build;
+import android.os.Bundle;
+import android.util.Size;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ToggleButton;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import android.util.Size;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import androidx.camera.core.*;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
-import com.google.mlkit.vision.barcode.internal.zzj;
 import com.google.mlkit.vision.common.InputImage;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class ScannerActivity extends AppCompatActivity {
 
@@ -66,13 +49,13 @@ public class ScannerActivity extends AppCompatActivity {
           @Override
           public void analyze(@NonNull ImageProxy image) {
 
-            System.out.println("analyse");
+//            System.out.println("analyse");
             InputImage inputImage =
                 InputImage.fromMediaImage(
                     Objects.requireNonNull(image.getImage()),
                     image.getImageInfo().getRotationDegrees());
 
-            System.out.println("scan");
+//            System.out.println("scan");
             BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                     .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
@@ -90,10 +73,11 @@ public class ScannerActivity extends AppCompatActivity {
                     barcodes -> {
                       System.out.println("barcode");
 
-                      System.out.println(barcodes);
-                      Main.barcodes.addAll(barcodes);
+                      for (Barcode b : barcodes) {
+                        Main.barcodes.add(new customBarcode(b));
+                      }
 
-                      for (Barcode barcode : barcodes) {
+                      /*for (Barcode barcode : barcodes) {
                         int valueType = barcode.getValueType();
                         switch (valueType) {
                           case Barcode.FORMAT_QR_CODE:
@@ -110,12 +94,13 @@ public class ScannerActivity extends AppCompatActivity {
                             break;
                           default:
                             //                Main.barcodes.add(barcode);
-                            setResult(RESULT_OK, null);
-                        }
-                      }
+                      */
                     })
                 .addOnFailureListener(e -> System.out.println("failure"))
-                .addOnCompleteListener(e -> image.close());
+                .addOnCompleteListener(e -> {
+                  image.close();
+                  if (currentSize != Main.barcodes.size()) setResult(RESULT_OK, null);
+                });
           }
         });
 
@@ -146,9 +131,11 @@ public class ScannerActivity extends AppCompatActivity {
                       System.out.println("barcode");
 
                       System.out.println(barcodes);
-                      Main.barcodes.addAll(barcodes);
 
-                      for (Barcode barcode : barcodes) {
+                      for (Barcode b : barcodes) {
+                        Main.barcodes.add(new customBarcode(b));
+                      }
+                      /*for (Barcode barcode : barcodes) {
                         int valueType = barcode.getValueType();
                         switch (valueType) {
                           case Barcode.FORMAT_QR_CODE:
@@ -163,9 +150,8 @@ public class ScannerActivity extends AppCompatActivity {
                             System.out.println(barcode.getRawValue());
                             break;
                           default:
-                            setResult(RESULT_OK, null);
                         }
-                      }
+                      }*/
                     })
                 .addOnFailureListener(e -> System.out.println("failure"))
                 .addOnCompleteListener(e -> {
@@ -178,21 +164,24 @@ public class ScannerActivity extends AppCompatActivity {
     View toggle = findViewById(R.id.flashToggle);
     toggleFlash(toggle);
 
-    View toggleAnalysis = findViewById(R.id.ScanToggle);
-    toggleAnalysis(toggleAnalysis);
+    View toggleAnalysisButton = findViewById(R.id.ScanToggle);
+    toggleAnalysis(toggleAnalysisButton);
 
   }
+
+  private int currentSize;
 
   private void toggleAnalysis(View toggle) {
     assert toggle instanceof ToggleButton;
     
     ((ToggleButton) toggle).setOnCheckedChangeListener(
         (buttonView, isChecked) -> {
-          View button = findViewById(R.id.scan_button);
+          View button = findViewById(R.id.captureButton);
           assert button instanceof Button;
           ((Button) button).setEnabled(!isChecked);
 
           if (isChecked) {
+            currentSize = Main.barcodes.size();
             analysisOn();
           } else {
             analysisOff();
@@ -209,7 +198,6 @@ public class ScannerActivity extends AppCompatActivity {
   private void analysisOn() {
     assert cameraProvider != null;
     cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, imageAnalysis);
-    setResult(RESULT_OK, null);
 
   }
 
@@ -234,7 +222,7 @@ public class ScannerActivity extends AppCompatActivity {
           .setTargetRotation(Surface.ROTATION_0)
           .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
           //        .setCameraSelector(cameraSelector)
-          .setTargetResolution(new Size(1440, 1080))
+//          .setTargetResolution(new Size(1440, 1080))
           .build();
 
   private ImageAnalysis imageAnalysisOnce =
@@ -242,7 +230,7 @@ public class ScannerActivity extends AppCompatActivity {
           .setTargetRotation(Surface.ROTATION_0)
           .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
           //        .setCameraSelector(cameraSelector)
-          .setTargetResolution(new Size(1440, 1080))
+//          .setTargetResolution(new Size(1440, 1080))
           .build();
 
   // Camera stuff:
@@ -306,8 +294,10 @@ public class ScannerActivity extends AppCompatActivity {
       }
     }*/
     assert cameraProvider != null;
+    currentSize = Main.barcodes.size();
     cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, imageAnalysisOnce);
-    setResult(RESULT_OK, null);
+    if (currentSize != Main.barcodes.size()) setResult(RESULT_OK, null);
+
   }
 
 }
