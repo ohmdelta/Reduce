@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
       table.addView(button);
     }
+
   }
 
   // open scanner activity

@@ -1,7 +1,10 @@
 package com.example.reduce;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Size;
@@ -17,6 +20,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LifecycleOwner;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.Barcode;
@@ -71,8 +75,7 @@ public class ScannerActivity extends AppCompatActivity {
             BarcodeScanner scanner = BarcodeScanning.getClient(options);
             scanner
                 .process(inputImage)
-                .addOnSuccessListener(
-                    barcodes -> updateBarcodes(barcodes))
+                .addOnSuccessListener(barcodes -> updateBarcodes(barcodes))
                 .addOnFailureListener(e -> System.out.println("failure"))
                 .addOnCompleteListener(
                     e -> {
@@ -86,7 +89,6 @@ public class ScannerActivity extends AppCompatActivity {
         new ImageAnalysis.Analyzer() {
           @Override
           public void analyze(@NonNull ImageProxy image) {
-//            System.out.println("analyse");
             InputImage inputImage =
                 InputImage.fromMediaImage(
                     Objects.requireNonNull(image.getImage()),
@@ -104,13 +106,15 @@ public class ScannerActivity extends AppCompatActivity {
             scanner
                 .process(inputImage)
                 .addOnSuccessListener(
-                    barcodes ->
-                      updateBarcodes(barcodes))
+                    barcodes -> {
+                      updateBarcodes(barcodes);
+                    })
                 .addOnFailureListener(e -> System.out.println("failure"))
-                .addOnCompleteListener(e -> {
-                  image.close();
-                  cameraProvider.unbind(imageAnalysisOnce);
-                });
+                .addOnCompleteListener(
+                    e -> {
+                      image.close();
+                      cameraProvider.unbind(imageAnalysisOnce);
+                    });
           }
         });
 
@@ -119,10 +123,9 @@ public class ScannerActivity extends AppCompatActivity {
 
     View toggleAnalysisButton = findViewById(R.id.ScanToggle);
     toggleAnalysis(toggleAnalysisButton);
-
   }
 
-  private void updateBarcodes (List<Barcode> barcodes) {
+  private void updateBarcodes(List<Barcode> barcodes) {
     CharSequence text = "Barcodes added: ";
     boolean updated = false;
 
@@ -131,6 +134,9 @@ public class ScannerActivity extends AppCompatActivity {
         setResult(RESULT_OK, null);
         updated = true;
         text += b.getDisplayValue() + " ";
+
+        UpdateDialog dialog = new UpdateDialog(b.getDisplayValue());
+        dialog.show(getSupportFragmentManager(), "dialog box");
       }
     }
 
@@ -145,20 +151,20 @@ public class ScannerActivity extends AppCompatActivity {
 
   private void toggleAnalysis(View toggle) {
     assert toggle instanceof ToggleButton;
-    
-    ((ToggleButton) toggle).setOnCheckedChangeListener(
-        (buttonView, isChecked) -> {
-          View button = findViewById(R.id.captureButton);
-          assert button instanceof Button;
-          ((Button) button).setEnabled(!isChecked);
 
-          if (isChecked) {
-            analysisOn();
-          } else {
-            analysisOff();
-          }
-        }
-    );
+    ((ToggleButton) toggle)
+        .setOnCheckedChangeListener(
+            (buttonView, isChecked) -> {
+              View button = findViewById(R.id.captureButton);
+              assert button instanceof Button;
+              ((Button) button).setEnabled(!isChecked);
+
+              if (isChecked) {
+                analysisOn();
+              } else {
+                analysisOff();
+              }
+            });
   }
 
   private void analysisOff() {
@@ -192,7 +198,7 @@ public class ScannerActivity extends AppCompatActivity {
           .setTargetRotation(Surface.ROTATION_0)
           .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
           //        .setCameraSelector(cameraSelector)
-//          .setTargetResolution(new Size(1440, 1080))
+          //          .setTargetResolution(new Size(1440, 1080))
           .build();
 
   private ImageAnalysis imageAnalysisOnce =
@@ -200,7 +206,7 @@ public class ScannerActivity extends AppCompatActivity {
           .setTargetRotation(Surface.ROTATION_0)
           .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
           //        .setCameraSelector(cameraSelector)
-//          .setTargetResolution(new Size(1440, 1080))
+          //          .setTargetResolution(new Size(1440, 1080))
           .build();
 
   // Camera stuff:
@@ -239,11 +245,8 @@ public class ScannerActivity extends AppCompatActivity {
   public void scanOnce(View view) {
     assert cameraProvider != null;
     cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, imageAnalysisOnce);
-
   }
-
 }
-
 
 //
 //        Task<List<Barcode>> result =
@@ -271,7 +274,7 @@ public class ScannerActivity extends AppCompatActivity {
 //  public void onError(@NonNull @NotNull ImageCaptureException exception) {
 //    super.onError(exception);
 //  }
-//});
+// });
 //
 ////          new ImageCapture.OutputFileResults().build();
 //
@@ -306,7 +309,6 @@ private void scanBarcodes(InputImage image) {
         for (Barcode barcode: barcodes) {
 */
 
-
 /*
             Rect bounds = barcode.getBoundingBox();
             Point[] corners = barcode.getCornerPoints();
@@ -314,26 +316,26 @@ private void scanBarcodes(InputImage image) {
             String rawValue = barcode.getRawValue();
 *//*
 
-          int valueType = barcode.getValueType();
-          // See API reference for complete list of supported types
-          switch (valueType) {
-            case Barcode.FORMAT_QR_CODE:
-              System.out.println(barcode.getDisplayValue());
-              break;
-            case Barcode.FORMAT_CODE_128:
-              barcodes.add(barcode);
-              break;
+            int valueType = barcode.getValueType();
+            // See API reference for complete list of supported types
+            switch (valueType) {
+              case Barcode.FORMAT_QR_CODE:
+                System.out.println(barcode.getDisplayValue());
+                break;
+              case Barcode.FORMAT_CODE_128:
+                barcodes.add(barcode);
+                break;
+            }
           }
-        }
-        // [END get_barcodes]
-        // [END_EXCLUDE]
-      })
-      .addOnFailureListener(e -> {
-        // Task failed with an exception
-        // ...
-        System.out.println("failed");
-      });
-  // [END run_detector]
+          // [END get_barcodes]
+          // [END_EXCLUDE]
+        })
+        .addOnFailureListener(e -> {
+          // Task failed with an exception
+          // ...
+          System.out.println("failed");
+        });
+    // [END run_detector]
 
-  System.out.println("finished");
-}*/
+    System.out.println("finished");
+  }*/
