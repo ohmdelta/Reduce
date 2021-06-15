@@ -29,6 +29,17 @@
               android:layout_marginBottom="4dp"
               android:hint="Location \(optional\)"
               android:id="@+id/location" android:inputType="text"/>
+    <TextView
+            android:text="Quantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    <SeekBar
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="9"
+            android:progress="0"
+            android:id="@+id/Quantity"/>
 
 
 </LinearLayout>
