@@ -10,10 +10,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import com.example.reduce.database.Product;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.mlkit.vision.barcode.Barcode;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +29,16 @@ public class MainActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    Realm.init(this);
+
+    Main.dataBase = Realm.getInstance(
+			  new RealmConfiguration
+					  .Builder()
+					  .name("main_database")
+					  .allowQueriesOnUiThread(true)
+					  .allowWritesOnUiThread(true)
+					  .build());
 
     updateTable();
 
@@ -50,9 +63,9 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout table = (LinearLayout) tableView;
     table.removeAllViews();
 
-    for (customBarcode barcode : Main.barcodes ) {
+    for (Product barcode : Main.dataBase.where(Product.class).findAll() ) {
       Button button = new Button(this);
-      button.setText(barcode.getBarcode().getDisplayValue());
+      button.setText(barcode.getProductName());
 //      byte[] b = barcode.getRawBytes();
 
       table.addView(button);

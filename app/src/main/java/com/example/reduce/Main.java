@@ -4,6 +4,10 @@ import android.app.Application;
 import androidx.collection.ArraySet;
 import com.google.mlkit.vision.barcode.Barcode;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmMap;
+
 import java.util.*;
 
 public class Main extends Application {
@@ -14,5 +18,5 @@ public class Main extends Application {
   public static Queue<Set<customBarcode>> parsedBarcodes = new PriorityQueue<>();
 
 //  public HashSet<String> barcodes = new HashSet<>();
-  
+	public static Realm dataBase;
 }
