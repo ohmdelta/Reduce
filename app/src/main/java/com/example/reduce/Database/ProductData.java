@@ -5,13 +5,12 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-
 @Entity(tableName = "product_table")
 public class ProductData {
 		@PrimaryKey
 		@NonNull
-		@ColumnInfo(name = "barcode_ID")
-		public String productID;
+		@ColumnInfo(name = "database_ID")
+		public int dataBaseID;
 
 		@ColumnInfo(name = "product_name")
 		public String productName;
@@ -24,5 +23,8 @@ public class ProductData {
 
 		@ColumnInfo(name = "quantity")
 		public int quantity;
+
+		@ColumnInfo(name = "barcodeID")
+		public String barcodeID;
 
 }

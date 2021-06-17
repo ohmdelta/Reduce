@@ -5,8 +5,17 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.SeekBar;
 import androidx.fragment.app.DialogFragment;
+import com.example.reduce.Database.ProductDao;
+import com.example.reduce.Database.ProductDao_Impl;
+import com.example.reduce.Database.ProductData;
 import org.jetbrains.annotations.NotNull;
+import android.view.View;
+
+import java.util.List;
 
 public class UpdateDialog extends DialogFragment {
 
@@ -29,7 +38,18 @@ public class UpdateDialog extends DialogFragment {
         .setPositiveButton(
             "OK",
             new DialogInterface.OnClickListener() {
-              public void onClick(DialogInterface dialog, int id) {}
+              public void onClick(DialogInterface dialog, int id) {
+	              /*ProductDao productDao = Main.db.productDao();
+	              ProductData product = new ProductData();
+
+	              EditText product_type = getActivity().findViewById(R.id.product_type);
+	              SeekBar seekBar = getActivity().findViewById(R.id.Quantity);
+
+								product.productName = product_type.getText().toString();
+								product.barcodeID = value;
+	              product.quantity = seekBar.getProgress();
+	              productDao.insert(product);*/
+              }
             })
         .setNegativeButton(
             "cancel",
