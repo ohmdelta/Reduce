@@ -22,6 +22,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LifecycleOwner;
+import com.example.reduce.database.Product;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
@@ -130,7 +131,11 @@ public class ScannerActivity extends AppCompatActivity {
     boolean updated = false;
 
     for (Barcode b : barcodes) {
-      if (Main.barcodes.add(new customBarcode(b))) {
+      if (Main.dataBase
+              .where(Product.class)
+              .beginsWith("barcodeId", b.getDisplayValue())
+              .findFirst()
+          == null) {
         setResult(RESULT_OK, null);
         updated = true;
         text += b.getDisplayValue() + " ";
@@ -138,7 +143,7 @@ public class ScannerActivity extends AppCompatActivity {
         UpdateDialog dialog = new UpdateDialog(b.getDisplayValue());
         dialog.show(getSupportFragmentManager(), "dialog box");
       }
-    }
+		}
 
     if (updated) {
       Context context = getApplicationContext();
@@ -147,6 +152,7 @@ public class ScannerActivity extends AppCompatActivity {
       Toast toast = Toast.makeText(context, text, duration);
       toast.show();
     }
+
   }
 
   private void toggleAnalysis(View toggle) {

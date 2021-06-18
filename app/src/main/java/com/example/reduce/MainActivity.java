@@ -17,6 +17,7 @@ import com.google.android.gms.ads.initialization.OnInitializationCompleteListene
 import com.google.mlkit.vision.barcode.Barcode;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.Sort;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -63,14 +64,18 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout table = (LinearLayout) tableView;
     table.removeAllViews();
 
-    for (Product barcode : Main.dataBase.where(Product.class).findAll() ) {
+    for (Product barcode :
+        Main.dataBase
+		        .where(Product.class)
+		        .sort("expDate", Sort.ASCENDING)
+		        .findAll()) {
+
       Button button = new Button(this);
-      button.setText(barcode.getProductName());
-//      byte[] b = barcode.getRawBytes();
+      button.setText(barcode.getProductName() + ": " + Main.dateFormat.format(barcode.getExpDate()));
+      //      byte[] b = barcode.getRawBytes();
 
       table.addView(button);
     }
-
   }
 
   // open scanner activity

@@ -8,15 +8,13 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmMap;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Main extends Application {
 
-  //TODO: change <String> to <custom.class> for Priority Queue
-  public static HashSet<customBarcode> barcodes = new HashSet<>();
-
-  public static Queue<Set<customBarcode>> parsedBarcodes = new PriorityQueue<>();
-
-//  public HashSet<String> barcodes = new HashSet<>();
 	public static Realm dataBase;
+
+	public static DateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy");
 }

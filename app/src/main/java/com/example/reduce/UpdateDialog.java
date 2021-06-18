@@ -6,18 +6,20 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import androidx.fragment.app.DialogFragment;
 import com.example.reduce.database.Product;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Calendar;
+
 public class UpdateDialog extends DialogFragment {
 
-  private String value;
+  private String barcodeId;
 
   public UpdateDialog(String displayValue) {
-    this.value = displayValue;
+    this.barcodeId = displayValue;
   }
 
   private EditText productType;
@@ -32,19 +34,34 @@ public class UpdateDialog extends DialogFragment {
 
     builder
         .setView(dialogView)
-        .setMessage(value)
+        .setMessage(barcodeId)
         .setPositiveButton(
             "OK",
             new DialogInterface.OnClickListener() {
               public void onClick(DialogInterface dialog, int id) {
 
-              	Product product = new Product(
+	              DatePicker expiryPicker = dialogView.findViewById(R.id.expiration_picker);
+
+	              // calendar get date
+	              Calendar cal = Calendar.getInstance();
+	              cal.set(Calendar.YEAR, expiryPicker.getYear());
+	              cal.set(Calendar.MONTH, expiryPicker.getMonth());
+	              cal.set(Calendar.DAY_OF_MONTH, expiryPicker.getDayOfMonth());
+
+	              Product product = new Product(
+			              barcodeId,
               			((EditText) dialogView.findViewById(R.id.product_type))
 					              .getText()
-					              .toString());
+					              .toString(),
+			              ((EditText) dialogView.findViewById(R.id.location))
+					              .getText()
+					              .toString(),
+			              1,
+			              cal.getTime()
+	              );
 
 	              Main.dataBase.executeTransaction (transactionRealm -> {
-		              transactionRealm.insert(product);
+									  transactionRealm.insertOrUpdate(product);
 	              });
 
 
@@ -57,7 +74,7 @@ public class UpdateDialog extends DialogFragment {
                 // User cancelled the dialog
               }
             })
-        .setTitle("Set barcode value: " + value);
+        .setTitle("Set barcode value: " + barcodeId);
     // Create the AlertDialog object and return it
 
 	  return builder.create();
