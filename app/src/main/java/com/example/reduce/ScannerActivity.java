@@ -21,7 +21,9 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LifecycleRegistry;
 import com.example.reduce.database.Product;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.Barcode;
@@ -35,15 +37,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class ScannerActivity extends AppCompatActivity {
 
-  @Override
+	private Set<String> tempSet;
+//	LifecycleRegistry lifecyle = new LifecycleRegistry(this);
+
+	@Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_scanner);
 
-    Bundle bundle = getIntent().getExtras();
+
+	  Bundle bundle = getIntent().getExtras();
     //    barcodeSet = (Set) bundle.get("BarcodeSet");
 
     while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -85,7 +92,7 @@ public class ScannerActivity extends AppCompatActivity {
           }
         });
 
-    imageAnalysisOnce.setAnalyzer(
+	  imageAnalysisOnce.setAnalyzer(
         ContextCompat.getMainExecutor(this),
         new ImageAnalysis.Analyzer() {
           @Override
@@ -126,21 +133,29 @@ public class ScannerActivity extends AppCompatActivity {
     toggleAnalysis(toggleAnalysisButton);
   }
 
-  private void updateBarcodes(List<Barcode> barcodes) {
-    CharSequence text = "Barcodes added: ";
+  private  void updateBarcodes(List<Barcode> barcodes) {
+//	  lifecyle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE);
+
+	  CharSequence text = "Barcodes added: ";
     boolean updated = false;
 
-    for (Barcode b : barcodes) {
+		Set<String> barcodeIds = new HashSet<>();
+
+		for (Barcode b : barcodes) {
+			barcodeIds.add(b.getDisplayValue());
+		}
+
+    for (String barcodeId : barcodeIds) {
       if (Main.dataBase
               .where(Product.class)
-              .beginsWith("barcodeId", b.getDisplayValue())
+              .beginsWith("barcodeId", barcodeId)
               .findFirst()
           == null) {
         setResult(RESULT_OK, null);
         updated = true;
-        text += b.getDisplayValue() + " ";
+        text += barcodeId + " ";
 
-        UpdateDialog dialog = new UpdateDialog(b.getDisplayValue());
+        UpdateDialog dialog = new UpdateDialog(barcodeId);
         dialog.show(getSupportFragmentManager(), "dialog box");
       }
 		}
@@ -152,6 +167,7 @@ public class ScannerActivity extends AppCompatActivity {
       Toast toast = Toast.makeText(context, text, duration);
       toast.show();
     }
+//	  lifecyle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME);
 
   }
 

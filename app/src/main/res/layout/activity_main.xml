@@ -31,10 +31,12 @@
             android:layout_height="350dp"
             tools:layout_editor_absoluteX="63dp" app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/scan_button" android:id="@+id/scrollView2">
-        <LinearLayout
+        <TableLayout
                 android:id="@+id/barcodeTable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"/>
+                android:orientation="vertical"
+                android:stretchColumns="0"
+        />
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

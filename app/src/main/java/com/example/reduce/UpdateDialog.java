@@ -32,6 +32,11 @@ public class UpdateDialog extends DialogFragment {
     LayoutInflater inflater = requireActivity().getLayoutInflater();
     View dialogView = inflater.inflate(R.layout.scanner_dialog, null);
 
+    /*Product initialProduct = new Product(barcodeId);
+	  Main.dataBase.executeTransaction (transactionRealm -> {
+		  transactionRealm.insertOrUpdate(initialProduct);
+	  });*/
+
     builder
         .setView(dialogView)
         .setMessage(barcodeId)

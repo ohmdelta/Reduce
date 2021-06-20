@@ -63,6 +63,10 @@ public class Product extends RealmObject {
 		return expDate;
 	}
 
+	public String getBarcodeId() {
+		return barcodeId;
+	}
+
 	public Product (String barcodeId, String productName, String location, int quantity, Date expDate) {
 		this.barcodeId = barcodeId;
 		this.productName = productName;
@@ -71,7 +75,7 @@ public class Product extends RealmObject {
 		this.expDate = expDate;
 	}
 
-	public Product (String barcodeId) {
+	public Product(String barcodeId) {
 		this.barcodeId = barcodeId;
 	}
 

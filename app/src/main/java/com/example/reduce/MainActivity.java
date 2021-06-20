@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
@@ -64,17 +65,44 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout table = (LinearLayout) tableView;
     table.removeAllViews();
 
+	  TableLayout tableLayout = (TableLayout) findViewById(R.id.barcodeTable);
     for (Product barcode :
-        Main.dataBase
-		        .where(Product.class)
-		        .sort("expDate", Sort.ASCENDING)
-		        .findAll()) {
+        Main.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
 
-      Button button = new Button(this);
-      button.setText(barcode.getProductName() + ": " + Main.dateFormat.format(barcode.getExpDate()));
-      //      byte[] b = barcode.getRawBytes();
+      View tableRow = getLayoutInflater().inflate(R.layout.display_data, null, false);
 
-      table.addView(button);
+      ((ImageButton) tableRow.findViewById(R.id.delete_key)).setOnClickListener(new View.OnClickListener() {
+	      public void onClick(View v) {
+
+	      	System.out.println(barcode.getBarcodeId());
+
+		      Main.dataBase.executeTransaction( transactionRealm -> {
+			      System.out.println(barcode.getBarcodeId());
+
+			      Product product = Main.dataBase
+					      .where(Product.class)
+					      .equalTo("barcodeId", barcode.getBarcodeId())
+					      .findFirst();
+			      assert product != null;
+			      product.deleteFromRealm();
+		      });
+		      updateTable();
+	      }
+      });
+
+      ((TextView) tableRow.findViewById(R.id.data_text))
+          .setText(barcode.getProductName() + ": " + Main.dateFormat.format(barcode.getExpDate()));
+      tableLayout.addView(tableRow);
+
+      /*DataView view = new DataView(
+          			this,
+          			barcode.getProductName() + ": " + Main.dateFormat.format(barcode.getExpDate()));
+      //      Button button = new Button(this);
+      //      button.setText();
+            //      byte[] b = barcode.getRawBytes();
+
+            table.addView(view);
+          }*/
     }
   }
 
