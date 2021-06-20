@@ -26,8 +26,9 @@ public class UpdateDialog extends DialogFragment {
   @NotNull
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-	  // Use the Builder class for convenient dialog construction
-    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+  	// Use the Builder class for convenient dialog construction
+	  AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
     LayoutInflater inflater = requireActivity().getLayoutInflater();
     View dialogView = inflater.inflate(R.layout.scanner_dialog, null);
@@ -81,7 +82,8 @@ public class UpdateDialog extends DialogFragment {
             })
         .setTitle("Set barcode value: " + barcodeId);
     // Create the AlertDialog object and return it
-
 	  return builder.create();
   }
+
+
 }
