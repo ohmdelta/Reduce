@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+            android:hardwareAccelerated="true"
             android:name=".Main"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
@@ -20,10 +21,12 @@
         />
 
         <activity android:name=".ScannerActivity"
+                  android:hardwareAccelerated="true"
                   android:configChanges="orientation"
                   android:screenOrientation="portrait">
         </activity>
         <activity android:name=".MainActivity"
+                  android:hardwareAccelerated="true"
                   android:configChanges="orientation"
                   android:screenOrientation="portrait">
             <intent-filter>

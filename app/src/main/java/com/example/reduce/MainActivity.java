@@ -1,27 +1,24 @@
 package com.example.reduce;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.view.LayoutInflater;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import com.example.reduce.database.Product;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.mlkit.vision.barcode.Barcode;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.Sort;
 
-import java.util.HashSet;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,13 +47,12 @@ public class MainActivity extends AppCompatActivity {
       ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, requestCode);
     }
 
-/*    System.out.println("permission:" +
-        (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-        == PackageManager.PERMISSION_DENIED)
-    );*/
+	  MobileAds.initialize(this);
 
-    MobileAds.initialize(this, initializationStatus -> {
-    });
+	  AdView mAdView = findViewById(R.id.adView);
+	  AdRequest adRequest = new AdRequest.Builder().build();
+	  mAdView.loadAd(adRequest);
+
   }
 
   public void updateTable() {
@@ -66,8 +62,23 @@ public class MainActivity extends AppCompatActivity {
     table.removeAllViews();
 
 	  TableLayout tableLayout = (TableLayout) findViewById(R.id.barcodeTable);
+
+	  String date = null;
     for (Product barcode :
         Main.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
+
+    	if (!Main.dateFormat.format(barcode.getExpDate()).equals(date)) {
+    		TextView dateHeader = new TextView(this);
+    		dateHeader
+				    .setText(Main.dateFormat.format(barcode.getExpDate()));
+				dateHeader
+						.setBackgroundColor(Color.GREEN);
+				dateHeader
+						.setTextColor(Color.WHITE);
+
+
+    		tableLayout.addView(dateHeader);
+	    }
 
       View tableRow = getLayoutInflater().inflate(R.layout.display_data, null, false);
 
@@ -90,19 +101,19 @@ public class MainActivity extends AppCompatActivity {
 	      }
       });
 
-      ((TextView) tableRow.findViewById(R.id.data_text))
-          .setText(barcode.getProductName() + ": " + Main.dateFormat.format(barcode.getExpDate()));
+      if (barcode.getProductName().isEmpty()) {
+        ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getBarcodeId());
+      } else {
+        ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getProductName());
+      }
+
+	    date = Main.dateFormat.format(barcode.getExpDate());
+
+      ((TextView) tableRow.findViewById(R.id.location_display))
+			    .setText(barcode.getLocation());
+
       tableLayout.addView(tableRow);
 
-      /*DataView view = new DataView(
-          			this,
-          			barcode.getProductName() + ": " + Main.dateFormat.format(barcode.getExpDate()));
-      //      Button button = new Button(this);
-      //      button.setText();
-            //      byte[] b = barcode.getRawBytes();
-
-            table.addView(view);
-          }*/
     }
   }
 
@@ -122,4 +133,11 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
+  private void addNotification() {
+	  NotificationCompat.Builder builder =
+			  new NotificationCompat.Builder(this)
+					  .setContentTitle("Items about to expire")
+					  .setContentText("");
+
+  }
 }

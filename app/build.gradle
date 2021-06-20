@@ -52,6 +52,11 @@ dependencies {
 
     implementation 'com.google.mlkit:barcode-scanning:16.1.1'
 
-    implementation 'com.google.android.gms:play-services-ads:20.1.0'
+//    ads
+    implementation 'com.google.android.gms:play-services-ads:20.2.0'
+
+//
+
+
 
 }
