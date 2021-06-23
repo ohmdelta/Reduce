@@ -1,15 +1,15 @@
 package com.example.reduce;
 
+import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import com.example.reduce.database.Product;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class DisplayProductInfo extends AppCompatActivity {
 
@@ -41,6 +41,7 @@ public class DisplayProductInfo extends AppCompatActivity {
 
 		((EditText) findViewById(R.id.location)).setText(product.getLocation());
 
+		cancel();
 	}
 
 	public void editProduct(View view) {
@@ -62,11 +63,49 @@ public class DisplayProductInfo extends AppCompatActivity {
 
 		temporary.setLocation(((EditText) findViewById(R.id.location)).getText().toString());
 
-		Main.dataBase.executeTransaction (transactionRealm -> {
-			transactionRealm.insertOrUpdate(temporary);
-		});
+		Main.dataBase.executeTransaction (transactionRealm -> transactionRealm.insertOrUpdate(temporary));
 
 		setResult(RESULT_OK, null);
 
+		cancel(view);
+
 	}
+
+	public void onBackPressed(View view) {
+		onBackPressed();
+	}
+
+	public void enableEdit(View view) {
+		findViewById(R.id.close_btn).setVisibility(View.GONE);
+		findViewById(R.id.edit_button).setVisibility(View.GONE);
+
+		findViewById(R.id.edit_product).setVisibility(View.VISIBLE);
+		findViewById(R.id.cancel_button).setVisibility(View.VISIBLE);
+
+		// enable inputs
+		((EditText) findViewById(R.id.product_name)).setInputType(InputType.TYPE_CLASS_TEXT);
+		((EditText) findViewById(R.id.location)).setInputType(InputType.TYPE_CLASS_TEXT);
+		findViewById(R.id.expiration_picker).setEnabled(true);
+	}
+
+	public void cancel(View view) {
+		cancel();
+	}
+
+	public void cancel() {
+
+		// disable previous buttons
+		findViewById(R.id.edit_product).setVisibility(View.GONE);
+		findViewById(R.id.cancel_button).setVisibility(View.GONE);
+
+		// enable edit buttons
+		findViewById(R.id.close_btn).setVisibility(View.VISIBLE);
+		findViewById(R.id.edit_button).setVisibility(View.VISIBLE);
+
+		// disable inputs
+		((EditText) findViewById(R.id.product_name)).setInputType(InputType.TYPE_NULL);
+		((EditText) findViewById(R.id.location)).setInputType(InputType.TYPE_NULL);
+		findViewById(R.id.expiration_picker).setEnabled(false);
+	}
+
 }
