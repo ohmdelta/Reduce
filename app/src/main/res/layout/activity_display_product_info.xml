@@ -15,7 +15,6 @@
     <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="none"
             android:id="@+id/product_name" app:layout_constraintTop_toBottomOf="@+id/barcodeId"
             android:autofillHints="Product Name"/>
 
@@ -24,7 +23,6 @@
                 android:id="@+id/expiration_picker"
                 android:datePickerMode="spinner"
                 android:calendarViewShown="false"
-                android:descendantFocusability="blocksDescendants"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
                 android:backgroundTint="@color/green_global"
@@ -34,7 +32,6 @@
               app:layout_constraintTop_toBottomOf="@+id/expiration_picker"
               android:id="@+id/location"
               android:autofillHints="location (optional)"
-              android:inputType="none"
     />
 
     <Button android:layout_width="wrap_content" android:layout_height="wrap_content"

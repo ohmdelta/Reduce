@@ -136,13 +136,11 @@ public class ScannerActivity extends AppCompatActivity {
           @Override
           public void analyze(@NonNull ImageProxy image) {
 
-            //            System.out.println("analyse");
             InputImage inputImage =
                 InputImage.fromMediaImage(
                     Objects.requireNonNull(image.getImage()),
                     image.getImageInfo().getRotationDegrees());
 
-            //            System.out.println("scan");
             BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                     .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
@@ -150,7 +148,6 @@ public class ScannerActivity extends AppCompatActivity {
             // [END set_detector_options]
 
             // [START get_detector]
-
             BarcodeScanner scanner = BarcodeScanning.getClient(options);
             scanner
                 .process(inputImage)
