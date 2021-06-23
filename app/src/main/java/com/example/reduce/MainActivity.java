@@ -127,9 +127,18 @@ public class MainActivity extends AppCompatActivity {
         ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getProductName());
       }
 
+      tableRow.findViewById(R.id.data_text)
+		      .setOnClickListener(v ->
+		      {
+		        displayProductDetails(v, barcode.getBarcodeId());
+		      }
+      );
+
       date = barcode.getExpDate();
 
-      ((TextView) tableRow.findViewById(R.id.location_display)).setText(barcode.getLocation());
+      ((TextView) tableRow
+		      .findViewById(R.id.location_display))
+		      .setText(barcode.getLocation());
 
       tableLayout.addView(tableRow);
     }
@@ -143,10 +152,10 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void displayProductDetails(View view, String barcodeId) {
-	  Intent intent = new Intent(this, ScannerActivity.class);
+	  Intent intent = new Intent(this, DisplayProductInfo.class);
 	  intent.putExtra("Extra_barcodeId", barcodeId);
 
-		startActivity(intent);
+	  startActivityForResult(intent,1);
   }
 
   @Override
