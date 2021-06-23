@@ -25,6 +25,7 @@ import io.realm.RealmConfiguration;
 import io.realm.Sort;
 
 import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -74,18 +75,28 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout table = (LinearLayout) tableView;
     table.removeAllViews();
 
-    TableLayout tableLayout = (TableLayout) findViewById(R.id.barcodeTable);
+    TableLayout tableLayout = findViewById(R.id.barcodeTable);
 
-    String date = null;
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.DAY_OF_YEAR, 3);
+
+    Date date = Calendar.getInstance().getTime();
     for (Product barcode :
         Main.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
 
-      if (!Main.dateFormat.format(barcode.getExpDate()).equals(date)) {
+      if (!(barcode.getExpDate()).equals(date)) {
+
         TextView dateHeader = new TextView(this);
         dateHeader.setText(Main.dateFormat.format(barcode.getExpDate()));
-        dateHeader.setBackgroundColor(Color.GREEN);
-        dateHeader.setTextColor(Color.WHITE);
 
+        if ((barcode.getExpDate()).compareTo(date) <= 0)
+          dateHeader.setBackgroundColor(Color.RED);
+        else if ((barcode.getExpDate()).compareTo(calendar.getTime()) <= 0)
+        	dateHeader.setBackgroundColor(Color.YELLOW);
+        else
+        	dateHeader.setBackgroundColor(Color.GREEN);
+
+        dateHeader.setTextColor(Color.BLACK);
         tableLayout.addView(dateHeader);
       }
 
@@ -93,26 +104,22 @@ public class MainActivity extends AppCompatActivity {
 
       ((ImageButton) tableRow.findViewById(R.id.delete_key))
           .setOnClickListener(
-              new View.OnClickListener() {
-                public void onClick(View v) {
+		          v -> {
 
-                  System.out.println(barcode.getBarcodeId());
+		            Main.dataBase.executeTransaction(
+		                transactionRealm -> {
 
-                  Main.dataBase.executeTransaction(
-                      transactionRealm -> {
-                        System.out.println(barcode.getBarcodeId());
+		                  Product product =
+		                      Main.dataBase
+		                          .where(Product.class)
+		                          .equalTo("barcodeId", barcode.getBarcodeId())
+		                          .findFirst();
 
-                        Product product =
-                            Main.dataBase
-                                .where(Product.class)
-                                .equalTo("barcodeId", barcode.getBarcodeId())
-                                .findFirst();
-                        assert product != null;
-                        product.deleteFromRealm();
-                      });
-                  updateTable();
-                }
-              });
+		                  assert product != null;
+		                  product.deleteFromRealm();
+		                });
+		            updateTable();
+		          });
 
       if (barcode.getProductName().isEmpty()) {
         ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getBarcodeId());
@@ -120,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getProductName());
       }
 
-      date = Main.dateFormat.format(barcode.getExpDate());
+      date = barcode.getExpDate();
 
       ((TextView) tableRow.findViewById(R.id.location_display)).setText(barcode.getLocation());
 
@@ -135,6 +142,13 @@ public class MainActivity extends AppCompatActivity {
     startActivityForResult(intent, 1);
   }
 
+  public void displayProductDetails(View view, String barcodeId) {
+	  Intent intent = new Intent(this, ScannerActivity.class);
+	  intent.putExtra("Extra_barcodeId", barcodeId);
+
+		startActivity(intent);
+  }
+
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
@@ -145,8 +159,13 @@ public class MainActivity extends AppCompatActivity {
   }
 
 	@Override
-	protected void onStop () {
-		super.onStop() ;
-		startService( new Intent(this, NotificationService.class)) ;
+	protected void onDestroy () {
+		super.onDestroy();
+
+		NotificationManager manager =
+				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		manager.cancelAll();
+
+		startService(new Intent(this, NotificationService.class));
 	}
 }

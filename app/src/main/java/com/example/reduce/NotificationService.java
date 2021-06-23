@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
-import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import com.example.reduce.database.Product;
 import io.realm.Realm;
@@ -23,10 +22,8 @@ public class NotificationService extends Service {
   public static final String NOTIFICATION_CHANNEL_ID = "10001";
   private static final String default_notification_channel_id = "default";
 
-  Timer timer;
-  TimerTask timerTask;
-  String TAG = "Timers";
-  int Your_X_SECS = 5;
+  private Timer timer;
+  private TimerTask timerTask;
 
   @Override
   public IBinder onBind(Intent arg0) {
@@ -36,6 +33,7 @@ public class NotificationService extends Service {
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
     super.onStartCommand(intent, flags, startId);
+
     startTimer();
     return START_STICKY;
   }
@@ -53,8 +51,8 @@ public class NotificationService extends Service {
     timer = new Timer();
     initializeTimerTask();
     Calendar cal = Calendar.getInstance();
-    cal.set(Calendar.HOUR_OF_DAY, 8);
-    cal.add(Calendar.DAY_OF_YEAR, 1);
+//    cal.set(Calendar.HOUR_OF_DAY, 8);
+    cal.add(Calendar.MINUTE, 1);
     //reminder at 8 am
     timer.schedule(timerTask, cal.getTime()); //
   }
@@ -71,11 +69,7 @@ public class NotificationService extends Service {
         new TimerTask() {
           public void run() {
             handler.post(
-                new Runnable() {
-                  public void run() {
-                    createNotification();
-                  }
-                });
+		            () -> createNotification());
           }
         };
   }

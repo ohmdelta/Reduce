@@ -33,11 +33,6 @@ public class UpdateDialog extends DialogFragment {
     LayoutInflater inflater = requireActivity().getLayoutInflater();
     View dialogView = inflater.inflate(R.layout.scanner_dialog, null);
 
-    /*Product initialProduct = new Product(barcodeId);
-	  Main.dataBase.executeTransaction (transactionRealm -> {
-		  transactionRealm.insertOrUpdate(initialProduct);
-	  });*/
-
     builder
         .setView(dialogView)
         .setMessage(barcodeId)
@@ -75,15 +70,12 @@ public class UpdateDialog extends DialogFragment {
             })
         .setNegativeButton(
             "cancel",
-            new DialogInterface.OnClickListener() {
-              public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
-              }
-            })
+		        (dialog, id) -> {
+		          // User cancelled the dialog
+		        })
         .setTitle("Set barcode value: " + barcodeId);
     // Create the AlertDialog object and return it
 	  return builder.create();
   }
-
 
 }
