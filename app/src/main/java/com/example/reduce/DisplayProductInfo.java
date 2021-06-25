@@ -5,6 +5,7 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.reduce.database.Product;
@@ -28,6 +29,15 @@ public class DisplayProductInfo extends AppCompatActivity {
 				.beginsWith("barcodeId", barcodeId)
 				.findFirst();
 
+		NumberPicker numberPicker = (NumberPicker) findViewById(R.id.quantity);
+		numberPicker.setMinValue(0);
+		numberPicker.setMaxValue(99);
+		numberPicker.setWrapSelectorWheel(false);
+
+		cancel();
+	}
+
+	private void init() {
 		((TextView) findViewById(R.id.barcodeId))
 				.setText(barcodeId);
 		((EditText) findViewById(R.id.product_name))
@@ -40,8 +50,7 @@ public class DisplayProductInfo extends AppCompatActivity {
 						expDate.get(Calendar.DAY_OF_MONTH));
 
 		((EditText) findViewById(R.id.location)).setText(product.getLocation());
-
-		cancel();
+		((NumberPicker) findViewById(R.id.quantity)).setValue(product.getQuantity());
 	}
 
 	public void editProduct(View view) {
@@ -62,6 +71,7 @@ public class DisplayProductInfo extends AppCompatActivity {
 		temporary.setExpDate(cal.getTime());
 
 		temporary.setLocation(((EditText) findViewById(R.id.location)).getText().toString());
+		temporary.setQuantity(((NumberPicker) findViewById(R.id.quantity)).getValue());
 
 		Main.dataBase.executeTransaction (transactionRealm -> transactionRealm.insertOrUpdate(temporary));
 
@@ -86,6 +96,8 @@ public class DisplayProductInfo extends AppCompatActivity {
 		((EditText) findViewById(R.id.product_name)).setInputType(InputType.TYPE_CLASS_TEXT);
 		((EditText) findViewById(R.id.location)).setInputType(InputType.TYPE_CLASS_TEXT);
 		findViewById(R.id.expiration_picker).setEnabled(true);
+		findViewById(R.id.quantity).setEnabled(true);
+
 	}
 
 	public void cancel(View view) {
@@ -93,6 +105,7 @@ public class DisplayProductInfo extends AppCompatActivity {
 	}
 
 	public void cancel() {
+		init();
 
 		// disable previous buttons
 		findViewById(R.id.edit_product).setVisibility(View.GONE);
@@ -106,6 +119,7 @@ public class DisplayProductInfo extends AppCompatActivity {
 		((EditText) findViewById(R.id.product_name)).setInputType(InputType.TYPE_NULL);
 		((EditText) findViewById(R.id.location)).setInputType(InputType.TYPE_NULL);
 		findViewById(R.id.expiration_picker).setEnabled(false);
+		findViewById(R.id.quantity).setEnabled(false);
 	}
 
 }
