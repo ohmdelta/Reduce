@@ -6,11 +6,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".DisplayProductInfo">
+
+
     <TextView android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:id="@+id/barcodeId"
-              app:layout_constraintTop_toTopOf="parent"
-    />
+              style="@style/TextAppearance.AppCompat.Title"
+              app:layout_constraintTop_toBottomOf="@+id/adView2"/>
 
     <EditText
             android:layout_width="match_parent"
@@ -72,5 +74,14 @@
             android:id="@+id/cancel_button"
             android:visibility="gone"
             app:layout_constraintEnd_toStartOf="@+id/edit_product"/>
+
+    <com.google.android.gms.ads.AdView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/adView2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:adUnitId="ca-app-pub-2863701946465942/4053776299"
+            app:adSize="BANNER"
+            app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

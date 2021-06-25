@@ -52,6 +52,9 @@ public class NotificationService extends Service {
     initializeTimerTask();
     Calendar cal = Calendar.getInstance();
     cal.set(Calendar.HOUR_OF_DAY, 8);
+    if (cal.compareTo(Calendar.getInstance()) <= 0) {
+      cal.add(Calendar.DATE,1);
+    }
 //    cal.add(Calendar.MINUTE, 1);
     //reminder at 8 am
     timer.schedule(timerTask, cal.getTime()); //

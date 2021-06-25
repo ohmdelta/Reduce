@@ -9,6 +9,8 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.reduce.database.Product;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.util.Calendar;
 
@@ -35,6 +37,10 @@ public class DisplayProductInfo extends AppCompatActivity {
 		numberPicker.setWrapSelectorWheel(false);
 
 		cancel();
+
+		AdView mAdView = findViewById(R.id.adView2);
+		AdRequest adRequest = new AdRequest.Builder().build();
+		mAdView.loadAd(adRequest);
 	}
 
 	private void init() {
