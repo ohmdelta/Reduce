@@ -1,0 +1,31 @@
+<TableRow
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+>
+
+
+    <Button
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/browser_actions_bg_grey"
+            android:id="@+id/data_text"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/location_display"/>
+
+
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/delete_key"
+            android:src="@android:drawable/ic_delete"
+            android:layout_toEndOf="@+id/data_text"
+            android:layout_alignParentTop="true"
+    />
+
+</TableRow>

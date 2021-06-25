@@ -1,12 +1,14 @@
 package com.example.reduce;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Size;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,7 +17,10 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
+import com.example.reduce.database.Product;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
@@ -23,18 +28,25 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.common.InputImage;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ScannerActivity extends AppCompatActivity {
 
-  @Override
+	private ImageAnalysis analysis =
+			new ImageAnalysis.Builder()
+					.setTargetRotation(Surface.ROTATION_0)
+					.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+					.build();
+
+	@Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_scanner);
 
-    Bundle bundle = getIntent().getExtras();
-    //    barcodeSet = (Set) bundle.get("BarcodeSet");
+	  Bundle bundle = getIntent().getExtras();
 
     while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
         == PackageManager.PERMISSION_DENIED) {
@@ -43,162 +55,119 @@ public class ScannerActivity extends AppCompatActivity {
 
     startCamera();
 
-    imageAnalysis.setAnalyzer(
-        ContextCompat.getMainExecutor(this),
-        new ImageAnalysis.Analyzer() {
-          @Override
-          public void analyze(@NonNull ImageProxy image) {
-
-//            System.out.println("analyse");
-            InputImage inputImage =
-                InputImage.fromMediaImage(
-                    Objects.requireNonNull(image.getImage()),
-                    image.getImageInfo().getRotationDegrees());
-
-//            System.out.println("scan");
-            BarcodeScannerOptions options =
-                new BarcodeScannerOptions.Builder()
-                    .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
-                    .build();
-            // [END set_detector_options]
-
-            //      Barcode.FORMAT_QR_CODE,
-            //      Barcode.FORMAT_CODE_128
-
-            // [START get_detector]
-            BarcodeScanner scanner = BarcodeScanning.getClient(options);
-            scanner
-                .process(inputImage)
-                .addOnSuccessListener(
-                    barcodes -> {
-                      System.out.println("barcode");
-
-                      for (Barcode b : barcodes) {
-                        Main.barcodes.add(new customBarcode(b));
-                      }
-
-                      /*for (Barcode barcode : barcodes) {
-                        int valueType = barcode.getValueType();
-                        switch (valueType) {
-                          case Barcode.FORMAT_QR_CODE:
-                            System.out.println(barcode.getDisplayValue());
-                            System.out.println("barcode value:");
-                            System.out.println(barcode.getRawValue());
-                            Main.barcodes.add(barcode);
-                            break;
-                          case Barcode.FORMAT_CODE_128:
-                            Main.barcodes.add(barcode);
-
-                            System.out.println("code 128");
-                            System.out.println(barcode.getRawValue());
-                            break;
-                          default:
-                            //                Main.barcodes.add(barcode);
-                      */
-                    })
-                .addOnFailureListener(e -> System.out.println("failure"))
-                .addOnCompleteListener(e -> {
-                  image.close();
-                  if (currentSize != Main.barcodes.size()) setResult(RESULT_OK, null);
-                });
-          }
-        });
-
-    imageAnalysisOnce.setAnalyzer(
-        ContextCompat.getMainExecutor(this),
-        new ImageAnalysis.Analyzer() {
-          @Override
-          public void analyze(@NonNull ImageProxy image) {
-//            System.out.println("analyse");
-            InputImage inputImage =
-                InputImage.fromMediaImage(
-                    Objects.requireNonNull(image.getImage()),
-                    image.getImageInfo().getRotationDegrees());
-
-            System.out.println("scan");
-            BarcodeScannerOptions options =
-                new BarcodeScannerOptions.Builder()
-                    .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
-                    .build();
-            // [END set_detector_options]
-
-            // [START get_detector]
-            BarcodeScanner scanner = BarcodeScanning.getClient(options);
-            scanner
-                .process(inputImage)
-                .addOnSuccessListener(
-                    barcodes -> {
-                      System.out.println("barcode");
-
-                      System.out.println(barcodes);
-
-                      for (Barcode b : barcodes) {
-                        Main.barcodes.add(new customBarcode(b));
-                      }
-                      /*for (Barcode barcode : barcodes) {
-                        int valueType = barcode.getValueType();
-                        switch (valueType) {
-                          case Barcode.FORMAT_QR_CODE:
-                            System.out.println(barcode.getDisplayValue());
-                            System.out.println("barcode value:");
-                            System.out.println(barcode.getRawValue());
-//                            Main.barcodes.add(barcode);
-                            break;
-                          case Barcode.FORMAT_CODE_128:
-//                            Main.barcodes.add(barcode);
-                            System.out.println("code 128");
-                            System.out.println(barcode.getRawValue());
-                            break;
-                          default:
-                        }
-                      }*/
-                    })
-                .addOnFailureListener(e -> System.out.println("failure"))
-                .addOnCompleteListener(e -> {
-                  image.close();
-                  cameraProvider.unbind(imageAnalysisOnce);
-                });
-          }
-        });
-
     View toggle = findViewById(R.id.flashToggle);
     toggleFlash(toggle);
 
     View toggleAnalysisButton = findViewById(R.id.ScanToggle);
     toggleAnalysis(toggleAnalysisButton);
+  }
+
+  private boolean dialogsOpen() {
+	  List<Fragment> fragments = this.getSupportFragmentManager().getFragments();
+
+	  for (Fragment f : fragments) {
+	    if (f instanceof UpdateDialog || f instanceof DialogFragment)
+	    	return true;
+	  }
+
+	  return false;
+  }
+
+  private void updateBarcodes(List<Barcode> barcodes) {
+
+	  CharSequence text = "Barcodes added: ";
+    boolean updated = false;
+
+		for (Barcode barcode : barcodes) {
+      if (Main.dataBase
+              .where(Product.class)
+              .beginsWith("barcodeId", barcode.getDisplayValue())
+              .findFirst()
+          == null) {
+        setResult(RESULT_OK, null);
+        updated = true;
+        text += barcode.getDisplayValue() + " ";
+
+        UpdateDialog dialog = new UpdateDialog(barcode.getDisplayValue());
+				dialog.show(getSupportFragmentManager(), "dialog box");
+      }
+		}
+
+    if (updated) {
+      Context context = getApplicationContext();
+      int duration = Toast.LENGTH_SHORT;
+
+      Toast toast = Toast.makeText(context, text, duration);
+      toast.show();
+    }
 
   }
 
-  private int currentSize;
-
   private void toggleAnalysis(View toggle) {
     assert toggle instanceof ToggleButton;
-    
-    ((ToggleButton) toggle).setOnCheckedChangeListener(
-        (buttonView, isChecked) -> {
-          View button = findViewById(R.id.captureButton);
-          assert button instanceof Button;
-          ((Button) button).setEnabled(!isChecked);
 
-          if (isChecked) {
-            currentSize = Main.barcodes.size();
-            analysisOn();
-          } else {
-            analysisOff();
-          }
-        }
-    );
+    ((ToggleButton) toggle)
+        .setOnCheckedChangeListener(
+            (buttonView, isChecked) -> {
+              View button = findViewById(R.id.captureButton);
+              assert button instanceof Button;
+              ((Button) button).setEnabled(!isChecked);
+
+              if (isChecked) {
+                analysisOn();
+                System.out.println("analysis on");
+              } else {
+                analysisOff();
+              }
+            });
   }
 
   private void analysisOff() {
     assert cameraProvider != null;
-    cameraProvider.unbind(imageAnalysis);
+    analysis.clearAnalyzer();
   }
 
   private void analysisOn() {
     assert cameraProvider != null;
-    cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, imageAnalysis);
 
+    analysis.setAnalyzer(
+        ContextCompat.getMainExecutor(this),
+        new ImageAnalysis.Analyzer() {
+          @Override
+          public void analyze(@NonNull ImageProxy image) {
+
+            InputImage inputImage =
+                InputImage.fromMediaImage(
+                    Objects.requireNonNull(image.getImage()),
+                    image.getImageInfo().getRotationDegrees());
+
+            BarcodeScannerOptions options =
+                new BarcodeScannerOptions.Builder()
+                    .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+                    .build();
+            // [END set_detector_options]
+
+            // [START get_detector]
+            BarcodeScanner scanner = BarcodeScanning.getClient(options);
+            scanner
+                .process(inputImage)
+                .addOnSuccessListener(
+                    barcodes -> {
+                      if (!barcodes.isEmpty()) {
+	                      analysis.clearAnalyzer();
+	                      ((ToggleButton) findViewById(R.id.ScanToggle)).setChecked(false);
+                        updateBarcodes(barcodes);
+
+                      }
+                    })
+                .addOnFailureListener(e -> System.out.println("failure"))
+                .addOnCompleteListener(
+                    e -> {
+                      image.close();
+                    });
+          }
+        });
+//    cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, imageAnalysis);
   }
 
   // Camera Functions:
@@ -217,21 +186,7 @@ public class ScannerActivity extends AppCompatActivity {
   private Camera camera;
   private Preview preview;
   private ProcessCameraProvider cameraProvider;
-  private ImageAnalysis imageAnalysis =
-      new ImageAnalysis.Builder()
-          .setTargetRotation(Surface.ROTATION_0)
-          .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-          //        .setCameraSelector(cameraSelector)
-//          .setTargetResolution(new Size(1440, 1080))
-          .build();
 
-  private ImageAnalysis imageAnalysisOnce =
-      new ImageAnalysis.Builder()
-          .setTargetRotation(Surface.ROTATION_0)
-          .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-          //        .setCameraSelector(cameraSelector)
-//          .setTargetResolution(new Size(1440, 1080))
-          .build();
 
   // Camera stuff:
   private void startCamera() {
@@ -262,86 +217,54 @@ public class ScannerActivity extends AppCompatActivity {
 
     camera = cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview);
 
+    cameraProvider.bindToLifecycle(this,
+		    CameraSelector.DEFAULT_BACK_CAMERA,
+		    analysis);
+
     //    camera.getCameraInfo().hasFlashUnit();
 
   }
 
-    /*
-        imageCapture.takePicture(cameraExecutor,
-        new ImageCapture.OnImageCapturedCallback() {
-          @RequiresApi(api = Build.VERSION_CODES.N)
+  public void scanOnce(View view) {
+    assert cameraProvider != null;
+    analysis.setAnalyzer(
+        ContextCompat.getMainExecutor(this),
+        new ImageAnalysis.Analyzer() {
           @Override
-          public void onCaptureSuccess(@NonNull ImageProxy image) {
-            //              Image img = image.getImage();
-
+          public void analyze(@NonNull ImageProxy image) {
             InputImage inputImage =
                 InputImage.fromMediaImage(
                     Objects.requireNonNull(image.getImage()),
                     image.getImageInfo().getRotationDegrees());
 
-            System.out.println(inputImage.getHeight());
-//            ImageView img = (ImageView) findViewById(R.id.imageView);
-//            img.setImageBitmap(inputImage.getBitmapInternal());
-            scanBarcodes(inputImage);
+            System.out.println("scan");
+            BarcodeScannerOptions options =
+                new BarcodeScannerOptions.Builder()
+                    .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+                    .build();
+            // [END set_detector_options]
+
+            // [START get_detector]
+            BarcodeScanner scanner = BarcodeScanning.getClient(options);
+            scanner
+                .process(inputImage)
+                .addOnSuccessListener(
+                    barcodes -> {
+                      if (!barcodes.isEmpty()) {
+                        analysis.clearAnalyzer();
+                        updateBarcodes(barcodes);
+                      }
+                    })
+                .addOnFailureListener(e -> System.out.println("failure"))
+                .addOnCompleteListener(
+                    e -> {
+                      image.close();
+                      analysis.clearAnalyzer();
+                    });
           }
-        });*/
-
-  public void scanOnce(View view) {
-    /*    while (!cameraProvider.isBound(imageAnalysis)) {
-      try {
-        analysisOn();
-      } catch (Exception e) {
-      }
-    }*/
-    assert cameraProvider != null;
-    currentSize = Main.barcodes.size();
-    cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, imageAnalysisOnce);
-    if (currentSize != Main.barcodes.size()) setResult(RESULT_OK, null);
-
+        });
   }
-
 }
-
-/*
-.addOnFailureListener(new OnFailureListener() {
-@Override
-public void onFailure(@NonNull Exception e) {
-    // Task failed with an exception
-    // ...
-    }
-    })*/
-
-//
-//        Task<List<Barcode>> result =
-//            scanner
-//                .process(inputImage)
-//                .addOnSuccessListener(
-//                    new OnSuccessListener<List<Barcode>>() {
-//                      @Override
-//                      public void onSuccess(List<Barcode> barcodes) {
-//                        // Task completed successfully
-//
-//                        if (!barcodes.isEmpty()) {
-//                          for (Barcode b : barcodes) {
-//                            Main.barcodes.add(b);
-//                          }
-//                          setResult(RESULT_OK, null);
-//                        }
-//                      }
-//                    });
-//    Main.barcodes.addAll(result.getResult());
-//    super.onCaptureSuccess(image);
-//  }
-//
-//  @Override
-//  public void onError(@NonNull @NotNull ImageCaptureException exception) {
-//    super.onError(exception);
-//  }
-//});
-//
-////          new ImageCapture.OutputFileResults().build();
-//
-////      ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY;
 
 /*
 private void scanBarcodes(InputImage image) {
@@ -372,34 +295,9 @@ private void scanBarcodes(InputImage image) {
         for (Barcode barcode: barcodes) {
 */
 
-
 /*
             Rect bounds = barcode.getBoundingBox();
             Point[] corners = barcode.getCornerPoints();
 
             String rawValue = barcode.getRawValue();
-*//*
-
-          int valueType = barcode.getValueType();
-          // See API reference for complete list of supported types
-          switch (valueType) {
-            case Barcode.FORMAT_QR_CODE:
-              System.out.println(barcode.getDisplayValue());
-              break;
-            case Barcode.FORMAT_CODE_128:
-              barcodes.add(barcode);
-              break;
-          }
-        }
-        // [END get_barcodes]
-        // [END_EXCLUDE]
-      })
-      .addOnFailureListener(e -> {
-        // Task failed with an exception
-        // ...
-        System.out.println("failed");
-      });
-  // [END run_detector]
-
-  System.out.println("finished");
-}*/
+*/

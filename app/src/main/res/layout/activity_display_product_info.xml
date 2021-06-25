@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".DisplayProductInfo">
+
+
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/barcodeId"
+              style="@style/TextAppearance.AppCompat.Title"
+              app:layout_constraintTop_toBottomOf="@+id/adView2"/>
+
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/product_name" app:layout_constraintTop_toBottomOf="@+id/barcodeId"
+            android:autofillHints="Product Name"/>
+
+    <DatePicker android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/expiration_picker"
+                android:datePickerMode="spinner"
+                android:calendarViewShown="false"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:backgroundTint="@color/green_global"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/product_name"/>
+
+    <EditText android:layout_width="match_parent" android:layout_height="wrap_content"
+              app:layout_constraintTop_toBottomOf="@+id/expiration_picker"
+              android:id="@+id/location"
+              android:autofillHints="location (optional)"
+    />
+
+    <NumberPicker android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/quantity"
+                  app:layout_constraintTop_toBottomOf="@+id/location" app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintStart_toStartOf="parent"/>
+
+    <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/edit"
+            android:onClick="enableEdit"
+            android:layout_margin="2dp"
+            android:id="@+id/edit_button"/>
+
+    <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+            android:text="close"
+            android:onClick="onBackPressed"
+            android:layout_margin="2dp"
+            android:id="@+id/close_btn"
+    />
+
+    <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="Done"
+            android:onClick="editProduct"
+            android:layout_margin="2dp"
+            android:id="@+id/edit_product"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="Cancel"
+            android:onClick="cancel"
+            android:layout_margin="2dp"
+            android:id="@+id/cancel_button"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/edit_product"/>
+
+    <com.google.android.gms.ads.AdView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/adView2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:adUnitId="ca-app-pub-2863701946465942/4053776299"
+            app:adSize="BANNER"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,18 +1,17 @@
 package com.example.reduce;
 
 import android.app.Application;
-import androidx.collection.ArraySet;
-import com.google.mlkit.vision.barcode.Barcode;
+import io.realm.Realm;
 
-import java.util.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class Main extends Application {
 
-  //TODO: change <String> to <custom.class> for Priority Queue
-  public static HashSet<customBarcode> barcodes = new HashSet<>();
+	public static Realm dataBase;
 
-  public static Queue<Set<customBarcode>> parsedBarcodes = new PriorityQueue<>();
+	public static DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-//  public HashSet<String> barcodes = new HashSet<>();
-  
+	public static Calendar reminderTime;
 }
