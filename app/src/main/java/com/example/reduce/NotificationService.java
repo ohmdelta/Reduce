@@ -6,17 +6,19 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
+import androidx.preference.PreferenceManager;
 import com.example.reduce.database.Product;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.Sort;
 
-import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class NotificationService extends Service {
   public static final String NOTIFICATION_CHANNEL_ID = "10001";
@@ -41,6 +43,11 @@ public class NotificationService extends Service {
   @Override
   public void onDestroy() {
     stopTimerTask();
+    NotificationManager manager
+            = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+    manager.cancelAll();
+
     super.onDestroy();
   }
 
@@ -50,12 +57,28 @@ public class NotificationService extends Service {
   public void startTimer() {
     timer = new Timer();
     initializeTimerTask();
+
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+
     Calendar cal = Calendar.getInstance();
-    cal.set(Calendar.HOUR_OF_DAY, 8);
+
+    try {
+      Calendar time = Calendar.getInstance();
+      String userTime = sharedPreferences.getString("time", "12:00");
+
+      time.setTime(dateFormat.parse(userTime));
+      cal.set(Calendar.HOUR, time.get(Calendar.HOUR));
+      cal.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
+    } catch (ParseException e) {
+    }
+
     if (cal.compareTo(Calendar.getInstance()) <= 0) {
       cal.add(Calendar.DATE,1);
     }
-//    cal.add(Calendar.MINUTE, 1);
+
+    System.out.println(cal.getTime());
+
     //reminder at 8 am
     timer.schedule(timerTask, cal.getTime()); //
   }
@@ -130,5 +153,6 @@ public class NotificationService extends Service {
 
     manager.notify((int) System.currentTimeMillis(), builder.build());
   }
+
 }
 

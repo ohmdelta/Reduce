@@ -4,14 +4,17 @@ import android.Manifest;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 import com.example.reduce.database.Product;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -20,6 +23,7 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.Sort;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -31,16 +35,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Realm.init(this);
-
-        Main.dataBase =
-                Realm.getInstance(
-                        new RealmConfiguration.Builder()
-                                .name("main_database")
-                                .allowQueriesOnUiThread(true)
-                                .allowWritesOnUiThread(true)
-                                .build());
 
         // get camera permissions
         while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -138,37 +132,44 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-  // open scanner activity
-  public void scan(View view) {
-    Intent intent = new Intent(this, ScannerActivity.class);
-    //    intent.putExtra("BarcodeSet",barcodeSet);
-    startActivityForResult(intent, 1);
-  }
-
-  public void displayProductDetails(View view, String barcodeId) {
-	  Intent intent = new Intent(this, DisplayProductInfo.class);
-	  intent.putExtra("Extra_barcodeId", barcodeId);
-
-	  startActivityForResult(intent,1);
-  }
-
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-
-    if (resultCode == RESULT_OK) {
-      updateTable();
+    // open scanner activity
+    public void scan(View view) {
+        Intent intent = new Intent(this, ScannerActivity.class);
+        //    intent.putExtra("BarcodeSet",barcodeSet);
+        startActivityForResult(intent, 1);
     }
-  }
 
-	@Override
-	protected void onDestroy () {
-		super.onDestroy();
+    public void settings(View view) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
 
-		NotificationManager manager =
-				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		manager.cancelAll();
+    public void displayProductDetails(View view, String barcodeId) {
+        Intent intent = new Intent(this, DisplayProductInfo.class);
+        intent.putExtra("Extra_barcodeId", barcodeId);
 
-		startService(new Intent(this, NotificationService.class));
-	}
+        startActivityForResult(intent,1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            updateTable();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        boolean notificationsOn = sharedPreferences.getBoolean("reminder", false);
+
+        if (notificationsOn) {
+            startService(new Intent(this, NotificationService.class));
+        }
+    }
 }

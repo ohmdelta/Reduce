@@ -16,6 +16,10 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.Reduce">
+        <activity
+                android:name=".SettingsActivity"
+                android:label="@string/title_activity_settings">
+        </activity>
         <activity android:name=".DisplayProductInfo">
         </activity>
 
@@ -35,11 +39,12 @@
                 android:hardwareAccelerated="true"
                 android:screenOrientation="portrait">
         </activity>
-
-        <activity android:name=".LoadingActivity"
-                  android:screenOrientation="portrait">
+        <activity
+                android:name=".LoadingActivity"
+                android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -49,6 +54,7 @@
                 android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.NotificationService"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </service>

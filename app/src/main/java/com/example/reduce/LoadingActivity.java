@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class LoadingActivity extends AppCompatActivity {
 
@@ -17,6 +19,15 @@ public class LoadingActivity extends AppCompatActivity {
             .postDelayed(
                     () -> {
                       startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+                        Realm.init(this);
+
+                        Main.dataBase =
+                                Realm.getInstance(
+                                        new RealmConfiguration.Builder()
+                                                .name("main_database")
+                                                .allowQueriesOnUiThread(true)
+                                                .allowWritesOnUiThread(true)
+                                                .build());
                       finish();
                     },1000);
     }
