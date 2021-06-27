@@ -53,4 +53,14 @@
             app:adUnitId="ca-app-pub-2863701946465942/9955389565"
     >
     </com.google.android.gms.ads.AdView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/green_global"
+            app:srcCompat="@android:drawable/ic_menu_preferences"
+            android:clickable="true"
+            android:id="@+id/floatingActionButton" android:layout_alignParentEnd="true"
+            android:onClick="settings"
+            android:layout_above="@+id/adView" android:focusable="true" android:contentDescription="Settings"/>
 </RelativeLayout>

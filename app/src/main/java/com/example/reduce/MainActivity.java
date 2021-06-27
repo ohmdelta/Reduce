@@ -6,16 +6,17 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 import com.example.reduce.database.Product;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -24,157 +25,191 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.Sort;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-  private static final int requestCode = 100;
+    private static final int requestCode = 100;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-    Realm.init(this);
+        // get camera permissions
+        while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(
+                    this, new String[] {Manifest.permission.CAMERA}, requestCode);
+        }
 
-    Main.dataBase =
-        Realm.getInstance(
-            new RealmConfiguration.Builder()
-                .name("main_database")
-                .allowQueriesOnUiThread(true)
-                .allowWritesOnUiThread(true)
-                .build());
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(
+                    this, new String[] {Manifest.permission.INTERNET}, requestCode);
+        }
 
-    updateTable();
+        MobileAds.initialize(this);
 
-    // get camera permissions
-    while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-        == PackageManager.PERMISSION_DENIED) {
-      ActivityCompat.requestPermissions(
-          this, new String[] {Manifest.permission.CAMERA}, requestCode);
+        AdView mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
-    if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
-        == PackageManager.PERMISSION_DENIED) {
-      ActivityCompat.requestPermissions(
-          this, new String[] {Manifest.permission.INTERNET}, requestCode);
+    @Override
+    protected void onStart() {
+        updateTable();
+        super.onStart();
     }
 
-    MobileAds.initialize(this);
+    public void updateTable() {
+        View tableView = this.findViewById(R.id.barcodeTable);
+        assert tableView instanceof LinearLayout;
+        LinearLayout table = (LinearLayout) tableView;
+        table.removeAllViews();
 
-    AdView mAdView = findViewById(R.id.adView);
-    AdRequest adRequest = new AdRequest.Builder().build();
-    mAdView.loadAd(adRequest);
+        TableLayout tableLayout = findViewById(R.id.barcodeTable);
 
-  }
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 3);
 
-  public void updateTable() {
-    View tableView = this.findViewById(R.id.barcodeTable);
-    assert tableView instanceof LinearLayout;
-    LinearLayout table = (LinearLayout) tableView;
-    table.removeAllViews();
+        Date date = Calendar.getInstance().getTime();
+        for (Product barcode :
+            Main.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
 
-    TableLayout tableLayout = findViewById(R.id.barcodeTable);
+            if (!(barcode.getExpDate()).equals(date)) {
 
-    Calendar calendar = Calendar.getInstance();
-    calendar.add(Calendar.DAY_OF_YEAR, 3);
+                TextView dateHeader = new TextView(this);
+                dateHeader.setText(Main.dateFormat.format(barcode.getExpDate()));
 
-    Date date = Calendar.getInstance().getTime();
-    for (Product barcode :
-        Main.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
+                if ((barcode.getExpDate()).compareTo(date) <= 0)
+                    dateHeader.setBackgroundColor(Color.RED);
+                else if ((barcode.getExpDate()).compareTo(calendar.getTime()) <= 0)
+        	        dateHeader.setBackgroundColor(Color.YELLOW);
+                else
+        	        dateHeader.setBackgroundColor(Color.GREEN);
 
-      if (!(barcode.getExpDate()).equals(date)) {
+                dateHeader.setTextColor(Color.BLACK);
+                tableLayout.addView(dateHeader);
+            }
 
-        TextView dateHeader = new TextView(this);
-        dateHeader.setText(Main.dateFormat.format(barcode.getExpDate()));
+            View tableRow = getLayoutInflater().inflate(R.layout.display_data, null, false);
 
-        if ((barcode.getExpDate()).compareTo(date) <= 0)
-          dateHeader.setBackgroundColor(Color.RED);
-        else if ((barcode.getExpDate()).compareTo(calendar.getTime()) <= 0)
-        	dateHeader.setBackgroundColor(Color.YELLOW);
-        else
-        	dateHeader.setBackgroundColor(Color.GREEN);
+            ((ImageButton) tableRow.findViewById(R.id.delete_key))
+                    .setOnClickListener(
+                            v -> {
+                                Main.dataBase.executeTransaction(
+                                        transactionRealm -> {
+                                            Product product =
+                                                    Main.dataBase
+                                                            .where(Product.class)
+                                                            .equalTo("barcodeId", barcode.getBarcodeId())
+                                                            .findFirst();
+                                            assert product != null;
+                                            product.deleteFromRealm();
+                                        });
+                                updateTable();
+                            });
 
-        dateHeader.setTextColor(Color.BLACK);
-        tableLayout.addView(dateHeader);
-      }
+        if (barcode.getProductName().isEmpty()) {
+            ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getBarcodeId());
+        } else {
+            ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getProductName());
+        }
 
-      View tableRow = getLayoutInflater().inflate(R.layout.display_data, null, false);
+        tableRow.findViewById(R.id.data_text)
+                .setOnClickListener(v -> {
+                    displayProductDetails(v, barcode.getBarcodeId());
+                });
 
-      ((ImageButton) tableRow.findViewById(R.id.delete_key))
-          .setOnClickListener(
-		          v -> {
+        date = barcode.getExpDate();
 
-		            Main.dataBase.executeTransaction(
-		                transactionRealm -> {
+        ((TextView) tableRow
+                .findViewById(R.id.location_display))
+                .setText(barcode.getLocation());
 
-		                  Product product =
-		                      Main.dataBase
-		                          .where(Product.class)
-		                          .equalTo("barcodeId", barcode.getBarcodeId())
-		                          .findFirst();
-
-		                  assert product != null;
-		                  product.deleteFromRealm();
-		                });
-		            updateTable();
-		          });
-
-      if (barcode.getProductName().isEmpty()) {
-        ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getBarcodeId());
-      } else {
-        ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getProductName());
-      }
-
-      tableRow.findViewById(R.id.data_text)
-		      .setOnClickListener(v ->
-		      {
-		        displayProductDetails(v, barcode.getBarcodeId());
-		      }
-      );
-
-      date = barcode.getExpDate();
-
-      ((TextView) tableRow
-		      .findViewById(R.id.location_display))
-		      .setText(barcode.getLocation());
-
-      tableLayout.addView(tableRow);
+        tableLayout.addView(tableRow);
+        }
     }
-  }
 
-  // open scanner activity
-  public void scan(View view) {
-    Intent intent = new Intent(this, ScannerActivity.class);
-    //    intent.putExtra("BarcodeSet",barcodeSet);
-    startActivityForResult(intent, 1);
-  }
-
-  public void displayProductDetails(View view, String barcodeId) {
-	  Intent intent = new Intent(this, DisplayProductInfo.class);
-	  intent.putExtra("Extra_barcodeId", barcodeId);
-
-	  startActivityForResult(intent,1);
-  }
-
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-
-    if (resultCode == RESULT_OK) {
-      updateTable();
+    // open scanner activity
+    public void scan(View view) {
+        Intent intent = new Intent(this, ScannerActivity.class);
+        //    intent.putExtra("BarcodeSet",barcodeSet);
+        startActivityForResult(intent, 1);
     }
-  }
 
-	@Override
-	protected void onDestroy () {
-		super.onDestroy();
+    public void settings(View view) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
 
-		NotificationManager manager =
-				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		manager.cancelAll();
+    public void displayProductDetails(View view, String barcodeId) {
+        Intent intent = new Intent(this, DisplayProductInfo.class);
+        intent.putExtra("Extra_barcodeId", barcodeId);
 
-		startService(new Intent(this, NotificationService.class));
-	}
+        startActivityForResult(intent,1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            updateTable();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        boolean notificationsOn = sharedPreferences.getBoolean("reminder", false);
+
+        if (notificationsOn) {
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MINUTE, 1);
+
+            Intent myIntent = new Intent(this, NotificationAlarm.class);
+            int ALARM1_ID = 10000;
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    this, ALARM1_ID, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, getTime(), pendingIntent);
+
+        }
+    }
+
+    public long getTime() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+
+        Calendar cal = Calendar.getInstance();
+
+        try {
+            Calendar time = Calendar.getInstance();
+            String userTime = sharedPreferences.getString("time", "12:00");
+
+            time.setTime(dateFormat.parse(userTime));
+            cal.set(Calendar.HOUR, time.get(Calendar.HOUR));
+            cal.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
+        } catch (ParseException e) {
+        }
+
+        if (cal.compareTo(Calendar.getInstance()) <= 0) {
+            cal.add(Calendar.DATE,1);
+        }
+
+        System.out.println(cal.getTime());
+        return cal.getTimeInMillis();
+
+    }
 }

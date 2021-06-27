@@ -1,0 +1,25 @@
+<PreferenceScreen
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+            app:title="Reminders">
+
+        <SwitchPreferenceCompat
+                app:key="reminder"
+                app:title="Reminder ON/OFF"
+                app:summaryOn="@string/time_on"
+                app:summaryOff="@string/time_off"
+        />
+
+        <ListPreference
+                app:key="time"
+                app:title="Time"
+                app:dependency="reminder"
+                app:entries="@array/times"
+                app:entryValues="@array/times"
+                app:defaultValue="12:00"
+                app:useSimpleSummaryProvider="true"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
