@@ -1,7 +1,9 @@
 package com.example.reduce;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,9 +25,12 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.Sort;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -169,7 +174,42 @@ public class MainActivity extends AppCompatActivity {
         boolean notificationsOn = sharedPreferences.getBoolean("reminder", false);
 
         if (notificationsOn) {
-            startService(new Intent(this, NotificationService.class));
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MINUTE, 1);
+
+            Intent myIntent = new Intent(this, NotificationAlarm.class);
+            int ALARM1_ID = 10000;
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    this, ALARM1_ID, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, getTime(), pendingIntent);
+
         }
+    }
+
+    public long getTime() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+
+        Calendar cal = Calendar.getInstance();
+
+        try {
+            Calendar time = Calendar.getInstance();
+            String userTime = sharedPreferences.getString("time", "12:00");
+
+            time.setTime(dateFormat.parse(userTime));
+            cal.set(Calendar.HOUR, time.get(Calendar.HOUR));
+            cal.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
+        } catch (ParseException e) {
+        }
+
+        if (cal.compareTo(Calendar.getInstance()) <= 0) {
+            cal.add(Calendar.DATE,1);
+        }
+
+        System.out.println(cal.getTime());
+        return cal.getTimeInMillis();
+
     }
 }

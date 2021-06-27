@@ -49,15 +49,14 @@
             </intent-filter>
         </activity>
 
-        <service
-                android:name=".NotificationService"
-                android:label="@string/app_name">
+        <receiver android:name=".NotificationAlarm"
+                  android:enabled="true">
             <intent-filter>
-                <action android:name="android.intent.action.NotificationService"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.media.action.DISPLAY_NOTIFICATION" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </service>
+        </receiver>
+
     </application>
 
 </manifest>
