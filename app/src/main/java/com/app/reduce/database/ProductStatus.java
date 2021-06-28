@@ -1,4 +1,4 @@
-package com.example.reduce.database;
+package com.app.reduce.database;
 
 public enum ProductStatus {
 		Open("Open"),

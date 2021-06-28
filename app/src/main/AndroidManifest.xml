@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-            android:name=".Main"
+            android:name="com.app.reduce.Main"
             android:allowBackup="true"
             android:hardwareAccelerated="true"
             android:icon="@mipmap/ic_launcher"
@@ -17,10 +17,10 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.Reduce">
         <activity
-                android:name=".SettingsActivity"
+                android:name="com.app.reduce.SettingsActivity"
                 android:label="@string/title_activity_settings">
         </activity>
-        <activity android:name=".DisplayProductInfo">
+        <activity android:name="com.app.reduce.DisplayProductInfo">
         </activity>
 
         <meta-data
@@ -28,19 +28,19 @@
                 android:value="ca-app-pub-2863701946465942~7712369602"/>
 
         <activity
-                android:name=".ScannerActivity"
+                android:name="com.app.reduce.ScannerActivity"
                 android:configChanges="orientation"
                 android:hardwareAccelerated="true"
                 android:screenOrientation="portrait">
         </activity>
         <activity
-                android:name=".MainActivity"
+                android:name="com.app.reduce.MainActivity"
                 android:configChanges="orientation"
                 android:hardwareAccelerated="true"
                 android:screenOrientation="portrait">
         </activity>
         <activity
-                android:name=".LoadingActivity"
+                android:name="com.app.reduce.LoadingActivity"
                 android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".NotificationAlarm"
+        <receiver android:name="com.app.reduce.NotificationAlarm"
                   android:enabled="true">
             <intent-filter>
                 <action android:name="android.media.action.DISPLAY_NOTIFICATION" />

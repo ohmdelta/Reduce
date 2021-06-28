@@ -1,4 +1,4 @@
-package com.example.reduce;
+package com.app.reduce;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -6,7 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import androidx.core.app.NotificationCompat;
-import com.example.reduce.database.Product;
+import com.example.reduce.R;
+import com.app.reduce.database.Product;
 
 import io.realm.Sort;
 

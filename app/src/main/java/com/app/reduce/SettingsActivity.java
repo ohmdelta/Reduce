@@ -1,9 +1,10 @@
-package com.example.reduce;
+package com.app.reduce;
 
 import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
+import com.example.reduce.R;
 
 public class SettingsActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.example.reduce;
+package com.app.reduce;
 
 import android.app.Application;
 import io.realm.Realm;
@@ -10,8 +10,8 @@ import java.util.Locale;
 
 public class Main extends Application {
 
-	public static Realm dataBase;
+    public static Realm dataBase;
 
-	public static DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+    public static DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
 }
