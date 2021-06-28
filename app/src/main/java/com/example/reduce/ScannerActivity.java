@@ -42,73 +42,63 @@ public class ScannerActivity extends AppCompatActivity {
 					.build();
 
 	@Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_scanner);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_scanner);
 
-	  Bundle bundle = getIntent().getExtras();
+	    Bundle bundle = getIntent().getExtras();
 
-    while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-        == PackageManager.PERMISSION_DENIED) {
-      ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, 100);
+        while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, 100);
+        }
+
+        startCamera();
+
+        View toggle = findViewById(R.id.flashToggle);
+        toggleFlash(toggle);
+
+        View toggleAnalysisButton = findViewById(R.id.ScanToggle);
+        toggleAnalysis(toggleAnalysisButton);
     }
 
-    startCamera();
 
-    View toggle = findViewById(R.id.flashToggle);
-    toggleFlash(toggle);
 
-    View toggleAnalysisButton = findViewById(R.id.ScanToggle);
-    toggleAnalysis(toggleAnalysisButton);
-  }
+    private void updateBarcodes(List<Barcode> barcodes) {
 
-  private boolean dialogsOpen() {
-	  List<Fragment> fragments = this.getSupportFragmentManager().getFragments();
-
-	  for (Fragment f : fragments) {
-	    if (f instanceof UpdateDialog || f instanceof DialogFragment)
-	    	return true;
-	  }
-
-	  return false;
-  }
-
-  private void updateBarcodes(List<Barcode> barcodes) {
-
-	  CharSequence text = "Barcodes added: ";
-    boolean updated = false;
+	    CharSequence text = "Barcodes added: ";
+        boolean updated = false;
 
 		for (Barcode barcode : barcodes) {
-      if (Main.dataBase
-              .where(Product.class)
-              .beginsWith("barcodeId", barcode.getDisplayValue())
-              .findFirst()
-          == null) {
-        setResult(RESULT_OK, null);
-        updated = true;
-        text += barcode.getDisplayValue() + " ";
+            if (Main.dataBase
+                .where(Product.class)
+                .beginsWith("barcodeId", barcode.getDisplayValue())
+                .findFirst() == null) {
+                    setResult(RESULT_OK, null);
+                    updated = true;
+                    text += barcode.getDisplayValue() + " ";
 
-        UpdateDialog dialog = new UpdateDialog(barcode.getDisplayValue());
-				dialog.show(getSupportFragmentManager(), "dialog box");
-      }
+                    UpdateDialog dialog = new UpdateDialog(barcode.getDisplayValue());
+				    dialog.show(getSupportFragmentManager(), "dialog box");
+            }
 		}
 
-    if (updated) {
-      Context context = getApplicationContext();
-      int duration = Toast.LENGTH_SHORT;
+        if (updated) {
+          Context context = getApplicationContext();
+          int duration = Toast.LENGTH_SHORT;
 
-      Toast toast = Toast.makeText(context, text, duration);
-      toast.show();
+          Toast toast = Toast.makeText(context, text, duration);
+          toast.show();
+        }
+
     }
 
-  }
+    private void toggleAnalysis(View toggle) {
+        assert toggle instanceof ToggleButton;
 
-  private void toggleAnalysis(View toggle) {
-    assert toggle instanceof ToggleButton;
-
-    ((ToggleButton) toggle)
-        .setOnCheckedChangeListener(
-            (buttonView, isChecked) -> {
+        ((ToggleButton) toggle)
+            .setOnCheckedChangeListener(
+                    (buttonView, isChecked) -> {
               View button = findViewById(R.id.captureButton);
               assert button instanceof Button;
               ((Button) button).setEnabled(!isChecked);

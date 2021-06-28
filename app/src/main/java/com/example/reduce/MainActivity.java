@@ -1,58 +1,36 @@
 package com.example.reduce;
 
-import android.Manifest;
 import android.app.AlarmManager;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
-import android.view.View;
-import android.widget.*;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 import com.example.reduce.database.Product;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import io.realm.Sort;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final int requestCode = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // get camera permissions
-        while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(
-                    this, new String[] {Manifest.permission.CAMERA}, requestCode);
-        }
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
-                == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(
-                    this, new String[] {Manifest.permission.INTERNET}, requestCode);
-        }
 
         MobileAds.initialize(this);
 
@@ -76,26 +54,40 @@ public class MainActivity extends AppCompatActivity {
         TableLayout tableLayout = findViewById(R.id.barcodeTable);
 
         Calendar calendar = Calendar.getInstance();
+        calendar.clear(Calendar.HOUR);
+        calendar.clear(Calendar.MINUTE);
+        calendar.clear(Calendar.SECOND);
         calendar.add(Calendar.DAY_OF_YEAR, 3);
 
-        Date date = Calendar.getInstance().getTime();
-        for (Product barcode :
-            Main.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
+        Calendar date = Calendar.getInstance();
+        date.clear();
 
-            if (!(barcode.getExpDate()).equals(date)) {
+        for (Product barcode :
+                Main.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
+
+            Calendar date1 = (Calendar) date.clone();
+            date1.add(Calendar.DAY_OF_YEAR,1);
+
+            if ((barcode.getExpDate()).after(date1.getTime())) {
 
                 TextView dateHeader = new TextView(this);
                 dateHeader.setText(Main.dateFormat.format(barcode.getExpDate()));
 
-                if ((barcode.getExpDate()).compareTo(date) <= 0)
+                if ((barcode.getExpDate()).before(Calendar.getInstance().getTime()))
                     dateHeader.setBackgroundColor(Color.RED);
-                else if ((barcode.getExpDate()).compareTo(calendar.getTime()) <= 0)
-        	        dateHeader.setBackgroundColor(Color.YELLOW);
+                else if ((barcode.getExpDate()).before(calendar.getTime()))
+                    dateHeader.setBackgroundColor(Color.YELLOW);
                 else
-        	        dateHeader.setBackgroundColor(Color.GREEN);
+                    dateHeader.setBackgroundColor(Color.GREEN);
 
                 dateHeader.setTextColor(Color.BLACK);
                 tableLayout.addView(dateHeader);
+
+                date.setTime(barcode.getExpDate());
+                date.clear(Calendar.HOUR);
+                date.clear(Calendar.MINUTE);
+                date.clear(Calendar.SECOND);
+
             }
 
             View tableRow = getLayoutInflater().inflate(R.layout.display_data, null, false);
@@ -116,24 +108,23 @@ public class MainActivity extends AppCompatActivity {
                                 updateTable();
                             });
 
-        if (barcode.getProductName().isEmpty()) {
-            ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getBarcodeId());
-        } else {
-            ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getProductName());
-        }
+            if (barcode.getProductName().isEmpty()) {
+                ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getBarcodeId());
+            } else {
+                ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getProductName());
+            }
 
-        tableRow.findViewById(R.id.data_text)
-                .setOnClickListener(v -> {
-                    displayProductDetails(v, barcode.getBarcodeId());
-                });
+            tableRow.findViewById(R.id.data_text)
+                    .setOnClickListener(v -> {
+                        displayProductDetails(v, barcode.getBarcodeId());
+                    });
 
-        date = barcode.getExpDate();
 
-        ((TextView) tableRow
-                .findViewById(R.id.location_display))
-                .setText(barcode.getLocation());
+            ((TextView) tableRow
+                    .findViewById(R.id.location_display))
+                    .setText(barcode.getLocation());
 
-        tableLayout.addView(tableRow);
+            tableLayout.addView(tableRow);
         }
     }
 
@@ -199,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             String userTime = sharedPreferences.getString("time", "12:00");
 
             time.setTime(dateFormat.parse(userTime));
-            cal.set(Calendar.HOUR, time.get(Calendar.HOUR));
+            cal.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
             cal.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
         } catch (ParseException e) {
         }
