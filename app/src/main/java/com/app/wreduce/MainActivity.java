@@ -1,4 +1,4 @@
-package com.app.reduce;
+package com.app.wreduce;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -15,7 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 import com.example.reduce.R;
-import com.app.reduce.database.Product;
+import com.app.wreduce.database.Product;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;

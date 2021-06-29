@@ -1,4 +1,4 @@
-package com.app.reduce;
+package com.app.wreduce;
 
 import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;

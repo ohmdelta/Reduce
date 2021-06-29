@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Reduce</string>
+    <string name="app_name">WReduce</string>
     <string name="scan_button">SCAN</string>
     <string name="edit">Edit</string>
     <string name="title_activity_settings">SettingsActivity</string>
@@ -7,4 +7,5 @@
     <!--    Preferences     -->
     <string name="time_on">Reminders are ON</string>
     <string name="time_off">Reminders are OFF</string>
+    <string name="back_button">back button</string>
 </resources>

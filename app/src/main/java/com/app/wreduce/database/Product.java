@@ -1,4 +1,4 @@
-package com.app.reduce.database;
+package com.app.wreduce.database;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

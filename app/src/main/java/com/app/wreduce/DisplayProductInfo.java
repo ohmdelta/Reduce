@@ -1,4 +1,4 @@
-package com.app.reduce;
+package com.app.wreduce;
 
 import android.os.Bundle;
 import android.text.InputType;
@@ -9,7 +9,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.reduce.R;
-import com.app.reduce.database.Product;
+import com.app.wreduce.database.Product;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 

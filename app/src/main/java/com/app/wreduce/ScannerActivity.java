@@ -1,4 +1,4 @@
-package com.app.reduce;
+package com.app.wreduce;
 
 import android.Manifest;
 import android.content.Context;
@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -18,7 +19,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 import com.example.reduce.R;
-import com.app.reduce.database.Product;
+import com.app.wreduce.database.Product;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
@@ -41,7 +42,11 @@ public class ScannerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(com.example.reduce.R.layout.activity_scanner);
+
 
         Bundle bundle = getIntent().getExtras();
 
@@ -210,6 +215,10 @@ public class ScannerActivity extends AppCompatActivity {
 
         //    camera.getCameraInfo().hasFlashUnit();
 
+    }
+
+    public void onBackPressed(View view) {
+        onBackPressed();
     }
 
     public void scanOnce(View view) {

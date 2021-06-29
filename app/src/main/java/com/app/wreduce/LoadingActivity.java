@@ -1,4 +1,4 @@
-package com.app.reduce;
+package com.app.wreduce;
 
 import android.Manifest;
 import android.content.Intent;

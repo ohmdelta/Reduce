@@ -12,7 +12,7 @@
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintVertical_bias="0.8"/>
     <TextView
-            android:text="Reduce"
+            android:text="@string/app_name"
             android:textColor="@color/green_global"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:id="@+id/textView"

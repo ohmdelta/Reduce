@@ -1,4 +1,4 @@
-package com.app.reduce.database;
+package com.app.wreduce.database;
 
 public enum ProductStatus {
 		Open("Open"),

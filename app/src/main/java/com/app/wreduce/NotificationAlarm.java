@@ -1,4 +1,4 @@
-package com.app.reduce;
+package com.app.wreduce;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import androidx.core.app.NotificationCompat;
 import com.example.reduce.R;
-import com.app.reduce.database.Product;
+import com.app.wreduce.database.Product;
 
 import io.realm.Sort;
 

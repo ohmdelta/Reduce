@@ -1,8 +1,7 @@
-package com.app.reduce;
+package com.app.wreduce;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import androidx.fragment.app.DialogFragment;
 import com.example.reduce.R;
-import com.app.reduce.database.Product;
+import com.app.wreduce.database.Product;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Calendar;
