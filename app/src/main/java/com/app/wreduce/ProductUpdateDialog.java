@@ -14,12 +14,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Calendar;
 
-public class UpdateDialog extends DialogFragment {
+public class ProductUpdateDialog extends DialogFragment {
 
   private final String barcodeId;
-  private final CalendarToday calendarToday = new CalendarToday();
 
-  public UpdateDialog(String displayValue) {
+  public ProductUpdateDialog(String displayValue) {
     this.barcodeId = displayValue;
   }
 
@@ -41,7 +40,7 @@ public class UpdateDialog extends DialogFragment {
             (dialog, id) -> {
               DatePicker expiryPicker = dialogView.findViewById(R.id.expiration_picker);
 
-              Calendar cal = calendarToday.getCalendarToday(expiryPicker);
+              Calendar cal = CalendarFunctions.getCalendarToday(expiryPicker);
 
               Product product =
                   new Product(

@@ -77,7 +77,7 @@ public class ScannerActivity extends AppCompatActivity {
                 updated = true;
                 text += barcode.getDisplayValue() + " ";
 
-                UpdateDialog dialog = new UpdateDialog(barcode.getDisplayValue());
+                ProductUpdateDialog dialog = new ProductUpdateDialog(barcode.getDisplayValue());
                 dialog.show(getSupportFragmentManager(), "dialog box");
             }
         }
