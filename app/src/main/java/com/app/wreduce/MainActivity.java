@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 Main.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
 
             Calendar date1 = (Calendar) date.clone();
-            date1.add(Calendar.DAY_OF_YEAR, 1);
+            date1.add(Calendar.DATE, 1);
 
             Date barcodeExpiryDate = barcode.getExpDate();
 
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 addDateSplitter(tableLayout, barcodeExpiryDate);
 
                 date.setTime(barcodeExpiryDate);
-                clearTimeOfDay(date);
+                CalendarFunctions.clearTimeOfDay(date);
 
             }
 
@@ -150,9 +150,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setColourOfBanner(Date barcodeDate, TextView dateHeader) {
         // Get date + 3
-        Calendar currentDayAddThree = Calendar.getInstance();
-        clearTimeOfDay(currentDayAddThree);
-        currentDayAddThree.add(Calendar.DAY_OF_YEAR, 3);
+        Calendar currentDayAddThree = CalendarFunctions.offsetTodayBy(3);
+        CalendarFunctions.clearTimeOfDay(currentDayAddThree);
 
         // barcode date < current time
         if (barcodeDate.before(Calendar.getInstance().getTime()))
@@ -167,12 +166,6 @@ public class MainActivity extends AppCompatActivity {
             dateHeader.setBackgroundColor(Color.GREEN);
 
         dateHeader.setTextColor(Color.BLACK);
-    }
-
-    private void clearTimeOfDay(Calendar calendar) {
-        calendar.clear(Calendar.HOUR);
-        calendar.clear(Calendar.MINUTE);
-        calendar.clear(Calendar.SECOND);
     }
 
     public void openScannerActivity(View view) {
@@ -222,9 +215,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (notificationsOn) {
 
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MINUTE, 1);
-
             Intent myIntent = new Intent(this, NotificationAlarm.class);
             int ALARM1_ID = 10000;
             PendingIntent pendingIntent = PendingIntent.getBroadcast(
@@ -254,8 +244,12 @@ public class MainActivity extends AppCompatActivity {
             String userTime = sharedPreferences.getString("time", "12:00");
 
             time.setTime(Objects.requireNonNull(timeFormat.parse(userTime)));
-            cal.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
-            cal.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
+
+            CalendarFunctions.setTimeTo(cal,
+		            time.get(Calendar.HOUR_OF_DAY),
+		            time.get(Calendar.MINUTE),
+		            0);
+
         } catch (ParseException ignored) {
         }
 
