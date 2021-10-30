@@ -6,7 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import androidx.core.app.NotificationCompat;
-import com.app.wreduce.Main;
+import com.app.wreduce.MainDatabase;
 import com.app.wreduce.MainActivity;
 import com.example.reduce.R;
 import com.app.wreduce.database.Product;
@@ -25,7 +25,7 @@ public class NotificationAlarm extends BroadcastReceiver {
 		cal.add(Calendar.DATE, 3);
 
 		for (Product barcode :
-				Main.dataBase.where(Product.class)
+				MainDatabase.dataBase.where(Product.class)
 						.sort("expDate", Sort.ASCENDING).findAll()) {
 			if (barcode.getExpDate().compareTo(cal.getTime()) >= 0) {
 				break;

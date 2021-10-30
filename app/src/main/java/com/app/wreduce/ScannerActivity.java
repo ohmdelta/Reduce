@@ -69,7 +69,7 @@ public class ScannerActivity extends AppCompatActivity {
         boolean updated = false;
 
         for (Barcode barcode : barcodes) {
-            if (Main.dataBase
+            if (MainDatabase.dataBase
                     .where(Product.class)
                     .beginsWith("barcodeId", Objects.requireNonNull(barcode.getDisplayValue()))
                     .findFirst() == null) {

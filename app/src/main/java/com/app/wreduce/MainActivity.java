@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         date.clear();
 
         for (Product barcode :
-                Main.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
+                MainDatabase.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
 
             Calendar date1 = (Calendar) date.clone();
             date1.add(Calendar.DATE, 1);

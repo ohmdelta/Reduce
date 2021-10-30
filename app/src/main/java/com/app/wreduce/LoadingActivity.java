@@ -28,7 +28,7 @@ public class LoadingActivity extends AppCompatActivity {
 						startActivity(new Intent(LoadingActivity.this, MainActivity.class));
 						Realm.init(this);
 
-						Main.dataBase =
+						MainDatabase.dataBase =
 								Realm.getInstance(
 										new RealmConfiguration.Builder()
 												.name("main_database")

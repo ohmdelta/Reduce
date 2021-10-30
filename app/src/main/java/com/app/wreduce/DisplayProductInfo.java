@@ -27,7 +27,7 @@ public class DisplayProductInfo extends AppCompatActivity {
 
         barcodeId = getIntent().getStringExtra("Extra_barcodeId");
 
-        product = Main.dataBase
+        product = MainDatabase.dataBase
                 .where(Product.class)
                 .beginsWith("barcodeId", barcodeId)
                 .findFirst();
@@ -80,7 +80,7 @@ public class DisplayProductInfo extends AppCompatActivity {
         temporary.setLocation(((EditText) findViewById(R.id.location)).getText().toString());
         temporary.setQuantity(((NumberPicker) findViewById(R.id.quantity)).getValue());
 
-        Main.dataBase.executeTransaction (transactionRealm -> transactionRealm.insertOrUpdate(temporary));
+        MainDatabase.dataBase.executeTransaction (transactionRealm -> transactionRealm.insertOrUpdate(temporary));
 
         setResult(RESULT_OK, null);
 

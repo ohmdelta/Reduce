@@ -51,7 +51,7 @@ public class ProductUpdateDialog extends DialogFragment {
                       1,
                       cal.getTime());
 
-              Main.dataBase.executeTransaction(
+              MainDatabase.dataBase.executeTransaction(
                   transactionRealm -> transactionRealm.insertOrUpdate(product));
             })
         .setNegativeButton("cancel", (dialog, id) -> {})
