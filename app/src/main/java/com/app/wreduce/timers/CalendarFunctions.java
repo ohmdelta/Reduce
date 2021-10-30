@@ -1,4 +1,4 @@
-package com.app.wreduce;
+package com.app.wreduce.timers;
 
 import android.widget.DatePicker;
 import org.jetbrains.annotations.NotNull;

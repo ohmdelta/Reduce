@@ -14,6 +14,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 import com.app.wreduce.database.Product;
+import com.app.wreduce.timers.CalendarFunctions;
+import com.app.wreduce.timers.NotificationAlarm;
 import com.example.reduce.BuildConfig;
 import com.example.reduce.R;
 import com.google.android.gms.ads.AdRequest;

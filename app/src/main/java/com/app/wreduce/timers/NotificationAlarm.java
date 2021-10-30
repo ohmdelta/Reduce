@@ -1,4 +1,4 @@
-package com.app.wreduce;
+package com.app.wreduce.timers;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import androidx.core.app.NotificationCompat;
+import com.app.wreduce.Main;
+import com.app.wreduce.MainActivity;
 import com.example.reduce.R;
 import com.app.wreduce.database.Product;
 

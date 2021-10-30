@@ -50,7 +50,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.app.wreduce.NotificationAlarm"
+        <receiver android:name="com.app.wreduce.timers.NotificationAlarm"
                   android:enabled="true">
             <intent-filter>
                 <action android:name="android.media.action.DISPLAY_NOTIFICATION" />

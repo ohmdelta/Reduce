@@ -25,7 +25,7 @@ public class LoadingActivity extends AppCompatActivity {
 		new Handler()
 			.postDelayed(
 					() -> {
-					  startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+						startActivity(new Intent(LoadingActivity.this, MainActivity.class));
 						Realm.init(this);
 
 						Main.dataBase =
@@ -49,7 +49,7 @@ public class LoadingActivity extends AppCompatActivity {
 									this, new String[] {Manifest.permission.INTERNET}, requestCode);
 						}
 
-					  finish();
+						finish();
 					},1000);
 	}
 }
