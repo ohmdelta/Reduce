@@ -82,14 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (barcodeExpiryDate.after(date1.getTime())) {
 
-                TextView dateHeader = new TextView(this);
-
-                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-
-                dateHeader.setText(dateFormat.format(barcodeExpiryDate));
-                setColourOfBanner(barcodeExpiryDate, dateHeader);
-
-                tableLayout.addView(dateHeader);
+                addDateSplitter(tableLayout, barcodeExpiryDate);
 
                 date.setTime(barcodeExpiryDate);
                 clearTimeOfDay(date);
@@ -117,20 +110,35 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /***
+     * Add a date divider to distinguish between product exp dates
+     * @param tableLayout product table
+     * @param barcodeExpiryDate barcode expiry date
+     */
+    private void addDateSplitter(TableLayout tableLayout, Date barcodeExpiryDate) {
+        TextView dateHeader = new TextView(this);
+
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+
+        dateHeader.setText(dateFormat.format(barcodeExpiryDate));
+        setColourOfBanner(barcodeExpiryDate, dateHeader);
+
+        tableLayout.addView(dateHeader);
+    }
+
+    /***
+     * Delete button in table
+     * Onclick delete item from table and database
+     * @param barcode barcode
+     * @param tableRow row of database table
+     */
     private void productDeleteHandler(Product barcode, View tableRow) {
         tableRow.findViewById(R.id.delete_key)
                 .setOnClickListener(
                         v -> {
-                            Main.dataBase.executeTransaction(
-                                    transactionRealm -> {
-                                        Product product =
-                                                Main.dataBase
-                                                        .where(Product.class)
-                                                        .equalTo("barcodeId", barcode.getBarcodeId())
-                                                        .findFirst();
-                                        assert product != null;
-                                        product.deleteFromRealm();
-                                    });
+                            barcode.delete();
+
+                            // TODO: don't use updateTable()
                             updateTable();
                         });
     }

@@ -1,5 +1,6 @@
 package com.app.wreduce.database;
 
+import com.app.wreduce.Main;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -78,4 +79,17 @@ public class Product extends RealmObject {
     }
 
     public Product() {}
+
+    public void delete() {
+        Main.dataBase.executeTransaction(
+                transactionRealm -> {
+                    Product product =
+                            Main.dataBase
+                                    .where(Product.class)
+                                    .equalTo("barcodeId", barcodeId)
+                                    .findFirst();
+                    assert product != null;
+                    product.deleteFromRealm();
+                });
+    }
 }
