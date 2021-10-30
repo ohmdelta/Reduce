@@ -16,47 +16,46 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Calendar;
 
 public class ProductUpdateDialog extends DialogFragment {
+	private final String barcodeId;
 
-  private final String barcodeId;
+	public ProductUpdateDialog(String displayValue) {
+		this.barcodeId = displayValue;
+	}
 
-  public ProductUpdateDialog(String displayValue) {
-    this.barcodeId = displayValue;
-  }
+	@NotNull
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-  @NotNull
-  @Override
-  public Dialog onCreateDialog(Bundle savedInstanceState) {
+		// Use the Builder class for convenient dialog construction
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-    // Use the Builder class for convenient dialog construction
-    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		LayoutInflater inflater = requireActivity().getLayoutInflater();
+		View dialogView = inflater.inflate(R.layout.scanner_dialog, null);
 
-    LayoutInflater inflater = requireActivity().getLayoutInflater();
-    View dialogView = inflater.inflate(R.layout.scanner_dialog, null);
+		builder
+				.setView(dialogView)
+				.setMessage(barcodeId)
+				.setPositiveButton(
+						"OK",
+						(dialog, id) -> {
+							DatePicker expiryPicker = dialogView.findViewById(R.id.expiration_picker);
 
-    builder
-        .setView(dialogView)
-        .setMessage(barcodeId)
-        .setPositiveButton(
-            "OK",
-            (dialog, id) -> {
-              DatePicker expiryPicker = dialogView.findViewById(R.id.expiration_picker);
+							Calendar cal = CalendarFunctions.getDateFromPicker(expiryPicker);
 
-              Calendar cal = CalendarFunctions.getCalendarToday(expiryPicker);
+							Product product =
+									new Product(
+											barcodeId,
+											((EditText) dialogView.findViewById(R.id.product_type)).getText().toString(),
+											((EditText) dialogView.findViewById(R.id.location)).getText().toString(),
+											1,
+											cal.getTime());
 
-              Product product =
-                  new Product(
-                      barcodeId,
-                      ((EditText) dialogView.findViewById(R.id.product_type)).getText().toString(),
-                      ((EditText) dialogView.findViewById(R.id.location)).getText().toString(),
-                      1,
-                      cal.getTime());
+							MainDatabase.dataBase.executeTransaction(
+									transactionRealm -> transactionRealm.insertOrUpdate(product));
+						})
+				.setNegativeButton("cancel", (dialog, id) -> {})
+				.setTitle("Set barcode value: " + barcodeId);
 
-              MainDatabase.dataBase.executeTransaction(
-                  transactionRealm -> transactionRealm.insertOrUpdate(product));
-            })
-        .setNegativeButton("cancel", (dialog, id) -> {})
-        .setTitle("Set barcode value: " + barcodeId);
-
-    return builder.create();
-  }
+		return builder.create();
+	}
 }

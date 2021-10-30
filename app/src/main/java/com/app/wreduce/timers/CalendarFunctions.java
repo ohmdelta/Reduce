@@ -20,7 +20,7 @@ public final class CalendarFunctions {
     }
 
     @NotNull
-    public static Calendar getCalendarToday(DatePicker expiryPicker) {
+    public static Calendar getDateFromPicker(DatePicker expiryPicker) {
         // calendar get date
         Calendar cal = Calendar.getInstance();
         setDateTo(cal, expiryPicker.getDayOfMonth(), expiryPicker.getMonth(), expiryPicker.getYear());
@@ -28,7 +28,7 @@ public final class CalendarFunctions {
         return cal;
     }
 
-    private static void setDateTo(Calendar cal, int day, int month, int year) {
+    public static void setDateTo(Calendar cal, int day, int month, int year) {
 	    cal.set(Calendar.DAY_OF_MONTH, day);
 	    cal.set(Calendar.MONTH, month);
 	    cal.set(Calendar.YEAR, year);
