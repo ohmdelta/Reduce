@@ -5,30 +5,22 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ScannerActivity">
+        tools:context="com.app.wreduce.ScannerActivity">
 
     <Button
             android:id="@+id/captureButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="50dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:scaleType="fitCenter"
+            android:background="@drawable/round_button"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:onClick="scanOnce"/>
+            android:onClick="scanOnce"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.9"/>
 
-    <!--<Button
-            android:id="@+id/flashButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="50dp"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="49dp"
-            app:layout_constraintStart_toEndOf="@+id/captureButton"
-            android:onClick="toggleFlashlight"
-            />-->
+
 
     <ToggleButton android:layout_width="50dp"
             android:layout_height="50dp"
@@ -53,6 +45,18 @@
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
     </androidx.camera.view.PreviewView>
+
+    <ImageButton
+            android:layout_margin="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/abc_vector_test"
+            android:id="@+id/imageButton"
+            android:onClick="onBackPressed"
+            app:backgroundTint="@android:color/transparent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" android:scaleX="1.5" android:scaleY="1.5"
+            android:contentDescription="@string/back_button"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
