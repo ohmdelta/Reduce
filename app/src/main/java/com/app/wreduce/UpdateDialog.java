@@ -8,64 +8,55 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import androidx.fragment.app.DialogFragment;
-import com.example.reduce.R;
 import com.app.wreduce.database.Product;
+import com.example.reduce.R;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Calendar;
 
 public class UpdateDialog extends DialogFragment {
 
-    private String barcodeId;
+  private final String barcodeId;
+  private final CalendarToday calendarToday = new CalendarToday();
 
-    public UpdateDialog(String displayValue) {
-	    this.barcodeId = displayValue;
-    }
+  public UpdateDialog(String displayValue) {
+    this.barcodeId = displayValue;
+  }
 
-	@NotNull
-	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
+  @NotNull
+  @Override
+  public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-		// Use the Builder class for convenient dialog construction
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    // Use the Builder class for convenient dialog construction
+    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-		LayoutInflater inflater = requireActivity().getLayoutInflater();
-		View dialogView = inflater.inflate(R.layout.scanner_dialog, null);
+    LayoutInflater inflater = requireActivity().getLayoutInflater();
+    View dialogView = inflater.inflate(R.layout.scanner_dialog, null);
 
-		builder
-                .setView(dialogView)
-                .setMessage(barcodeId)
-                .setPositiveButton("OK",
-                        (dialog, id) -> {
-                    DatePicker expiryPicker = dialogView.findViewById(R.id.expiration_picker);
+    builder
+        .setView(dialogView)
+        .setMessage(barcodeId)
+        .setPositiveButton(
+            "OK",
+            (dialog, id) -> {
+              DatePicker expiryPicker = dialogView.findViewById(R.id.expiration_picker);
 
-                    // calendar get date
-                    Calendar cal = Calendar.getInstance();
-                    cal.set(Calendar.YEAR, expiryPicker.getYear());
-                    cal.set(Calendar.MONTH, expiryPicker.getMonth());
-                    cal.set(Calendar.DAY_OF_MONTH, expiryPicker.getDayOfMonth());
+              Calendar cal = calendarToday.getCalendarToday(expiryPicker);
 
-                    Product product = new Product(
-                            barcodeId,
-                            ((EditText) dialogView.findViewById(R.id.product_type))
-                                    .getText().toString(),
-                            ((EditText) dialogView.findViewById(R.id.location))
-                                    .getText().toString(),
-                            1,
-                            cal.getTime()
-                    );
+              Product product =
+                  new Product(
+                      barcodeId,
+                      ((EditText) dialogView.findViewById(R.id.product_type)).getText().toString(),
+                      ((EditText) dialogView.findViewById(R.id.location)).getText().toString(),
+                      1,
+                      cal.getTime());
 
-                    Main.dataBase.executeTransaction (transactionRealm -> {
-                        transactionRealm.insertOrUpdate(product);
-                    });
-                })
-                .setNegativeButton(
-                        "cancel",
-                        (dialog, id) -> {}
-                )
-                .setTitle("Set barcode value: " + barcodeId);
+              Main.dataBase.executeTransaction(
+                  transactionRealm -> transactionRealm.insertOrUpdate(product));
+            })
+        .setNegativeButton("cancel", (dialog, id) -> {})
+        .setTitle("Set barcode value: " + barcodeId);
 
-		return builder.create();
-    }
-
+    return builder.create();
+  }
 }

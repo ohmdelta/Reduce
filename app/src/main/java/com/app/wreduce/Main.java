@@ -11,6 +11,5 @@ public class Main extends Application {
 
     public static Realm dataBase;
 
-    public static DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
 }

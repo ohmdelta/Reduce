@@ -8,23 +8,25 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
-import com.example.reduce.R;
 import com.app.wreduce.database.Product;
+import com.example.reduce.BuildConfig;
+import com.example.reduce.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import io.realm.Sort;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateTable() {
         View tableView = this.findViewById(R.id.barcodeTable);
-        assert tableView instanceof LinearLayout;
+        if (BuildConfig.DEBUG && !(tableView instanceof LinearLayout)) {
+            throw new AssertionError("Assertion failed");
+        }
         LinearLayout table = (LinearLayout) tableView;
         table.removeAllViews();
 
@@ -67,12 +71,14 @@ public class MainActivity extends AppCompatActivity {
                 Main.dataBase.where(Product.class).sort("expDate", Sort.ASCENDING).findAll()) {
 
             Calendar date1 = (Calendar) date.clone();
-            date1.add(Calendar.DAY_OF_YEAR,1);
+            date1.add(Calendar.DAY_OF_YEAR, 1);
 
             if ((barcode.getExpDate()).after(date1.getTime())) {
 
                 TextView dateHeader = new TextView(this);
-                dateHeader.setText(Main.dateFormat.format(barcode.getExpDate()));
+
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                dateHeader.setText(dateFormat.format(barcode.getExpDate()));
 
                 if ((barcode.getExpDate()).before(Calendar.getInstance().getTime()))
                     dateHeader.setBackgroundColor(Color.RED);
@@ -93,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
             View tableRow = getLayoutInflater().inflate(R.layout.display_data, null, false);
 
-            ((ImageButton) tableRow.findViewById(R.id.delete_key))
+            tableRow.findViewById(R.id.delete_key)
                     .setOnClickListener(
                             v -> {
                                 Main.dataBase.executeTransaction(
@@ -116,9 +122,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             tableRow.findViewById(R.id.data_text)
-                    .setOnClickListener(v -> {
-                        displayProductDetails(v, barcode.getBarcodeId());
-                    });
+                    .setOnClickListener(v -> displayProductDetails(barcode.getBarcodeId()));
 
 
             ((TextView) tableRow
@@ -141,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void displayProductDetails(View view, String barcodeId) {
+    public void displayProductDetails(String barcodeId) {
         Intent intent = new Intent(this, DisplayProductInfo.class);
         intent.putExtra("Extra_barcodeId", barcodeId);
 
@@ -182,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
     public long getTime() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
 
         Calendar cal = Calendar.getInstance();
 
@@ -190,10 +194,10 @@ public class MainActivity extends AppCompatActivity {
             Calendar time = Calendar.getInstance();
             String userTime = sharedPreferences.getString("time", "12:00");
 
-            time.setTime(dateFormat.parse(userTime));
+            time.setTime(Objects.requireNonNull(timeFormat.parse(userTime)));
             cal.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
             cal.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
-        } catch (ParseException e) {
+        } catch (ParseException ignored) {
         }
 
         if (cal.compareTo(Calendar.getInstance()) <= 0) {

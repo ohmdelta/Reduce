@@ -32,7 +32,7 @@ public class DisplayProductInfo extends AppCompatActivity {
                 .beginsWith("barcodeId", barcodeId)
                 .findFirst();
 
-        NumberPicker numberPicker = (NumberPicker) findViewById(R.id.quantity);
+        NumberPicker numberPicker = findViewById(R.id.quantity);
         numberPicker.setMinValue(0);
         numberPicker.setMaxValue(99);
         numberPicker.setWrapSelectorWheel(false);
