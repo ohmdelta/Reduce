@@ -25,6 +25,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         MobileAds.initialize(this);
 
+        // init ads
         AdView mAdView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
@@ -44,25 +46,28 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
+        // init product table
         updateTable();
         super.onStart();
     }
 
+    /***
+     * Hard updates table:
+     * Clears table & reinserts all products back in order
+     * TODO: reimplement to be more efficient using second list of products to add
+     */
     public void updateTable() {
         View tableView = this.findViewById(R.id.barcodeTable);
         if (BuildConfig.DEBUG && !(tableView instanceof LinearLayout)) {
             throw new AssertionError("Assertion failed");
         }
+
         LinearLayout table = (LinearLayout) tableView;
+
+        // clear table
         table.removeAllViews();
 
         TableLayout tableLayout = findViewById(R.id.barcodeTable);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.clear(Calendar.HOUR);
-        calendar.clear(Calendar.MINUTE);
-        calendar.clear(Calendar.SECOND);
-        calendar.add(Calendar.DAY_OF_YEAR, 3);
 
         Calendar date = Calendar.getInstance();
         date.clear();
@@ -73,47 +78,27 @@ public class MainActivity extends AppCompatActivity {
             Calendar date1 = (Calendar) date.clone();
             date1.add(Calendar.DAY_OF_YEAR, 1);
 
-            if ((barcode.getExpDate()).after(date1.getTime())) {
+            Date barcodeExpiryDate = barcode.getExpDate();
+
+            if (barcodeExpiryDate.after(date1.getTime())) {
 
                 TextView dateHeader = new TextView(this);
 
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-                dateHeader.setText(dateFormat.format(barcode.getExpDate()));
 
-                if ((barcode.getExpDate()).before(Calendar.getInstance().getTime()))
-                    dateHeader.setBackgroundColor(Color.RED);
-                else if ((barcode.getExpDate()).before(calendar.getTime()))
-                    dateHeader.setBackgroundColor(Color.YELLOW);
-                else
-                    dateHeader.setBackgroundColor(Color.GREEN);
+                dateHeader.setText(dateFormat.format(barcodeExpiryDate));
+                setColourOfBanner(barcodeExpiryDate, dateHeader);
 
-                dateHeader.setTextColor(Color.BLACK);
                 tableLayout.addView(dateHeader);
 
-                date.setTime(barcode.getExpDate());
-                date.clear(Calendar.HOUR);
-                date.clear(Calendar.MINUTE);
-                date.clear(Calendar.SECOND);
+                date.setTime(barcodeExpiryDate);
+                clearTimeOfDay(date);
 
             }
 
             View tableRow = getLayoutInflater().inflate(R.layout.display_data, null, false);
 
-            tableRow.findViewById(R.id.delete_key)
-                    .setOnClickListener(
-                            v -> {
-                                Main.dataBase.executeTransaction(
-                                        transactionRealm -> {
-                                            Product product =
-                                                    Main.dataBase
-                                                            .where(Product.class)
-                                                            .equalTo("barcodeId", barcode.getBarcodeId())
-                                                            .findFirst();
-                                            assert product != null;
-                                            product.deleteFromRealm();
-                                        });
-                                updateTable();
-                            });
+            productDeleteHandler(barcode, tableRow);
 
             if (barcode.getProductName().isEmpty()) {
                 ((TextView) tableRow.findViewById(R.id.data_text)).setText(barcode.getBarcodeId());
@@ -124,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
             tableRow.findViewById(R.id.data_text)
                     .setOnClickListener(v -> displayProductDetails(barcode.getBarcodeId()));
 
-
             ((TextView) tableRow
                     .findViewById(R.id.location_display))
                     .setText(barcode.getLocation());
@@ -133,18 +117,71 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // open scanner activity
-    public void scan(View view) {
+    private void productDeleteHandler(Product barcode, View tableRow) {
+        tableRow.findViewById(R.id.delete_key)
+                .setOnClickListener(
+                        v -> {
+                            Main.dataBase.executeTransaction(
+                                    transactionRealm -> {
+                                        Product product =
+                                                Main.dataBase
+                                                        .where(Product.class)
+                                                        .equalTo("barcodeId", barcode.getBarcodeId())
+                                                        .findFirst();
+                                        assert product != null;
+                                        product.deleteFromRealm();
+                                    });
+                            updateTable();
+                        });
+    }
+
+    /**
+     * Sets colour of banners/dividers according to expiry dates
+     * @param barcodeDate barcode date of expiry
+     * @param dateHeader divider TextView
+     */
+    private void setColourOfBanner(Date barcodeDate, TextView dateHeader) {
+        // Get date + 3
+        Calendar currentDayAddThree = Calendar.getInstance();
+        clearTimeOfDay(currentDayAddThree);
+        currentDayAddThree.add(Calendar.DAY_OF_YEAR, 3);
+
+        // barcode date < current time
+        if (barcodeDate.before(Calendar.getInstance().getTime()))
+            dateHeader.setBackgroundColor(Color.RED);
+
+        // barcode date < current time + 3 days
+        else if (barcodeDate.before(currentDayAddThree.getTime()))
+            dateHeader.setBackgroundColor(Color.YELLOW);
+
+        // barcode date not about to expire
+        else
+            dateHeader.setBackgroundColor(Color.GREEN);
+
+        dateHeader.setTextColor(Color.BLACK);
+    }
+
+    private void clearTimeOfDay(Calendar calendar) {
+        calendar.clear(Calendar.HOUR);
+        calendar.clear(Calendar.MINUTE);
+        calendar.clear(Calendar.SECOND);
+    }
+
+    public void openScannerActivity(View view) {
         Intent intent = new Intent(this, ScannerActivity.class);
         //    intent.putExtra("BarcodeSet",barcodeSet);
         startActivityForResult(intent, 1);
     }
 
-    public void settings(View view) {
+    public void openSettingsActivity(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
 
+    /***
+     * Start activity to display product details
+     * @param barcodeId barcodeId as string
+     */
     public void displayProductDetails(String barcodeId) {
         Intent intent = new Intent(this, DisplayProductInfo.class);
         intent.putExtra("Extra_barcodeId", barcodeId);
@@ -152,6 +189,9 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent,1);
     }
 
+    /**
+    * Update table if added new products
+    * */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -161,6 +201,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * On exit set notifications
+     * */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -179,14 +222,22 @@ public class MainActivity extends AppCompatActivity {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(
                     this, ALARM1_ID, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, getTime(), pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, getAlarmTimeAsLong(), pendingIntent);
 
         }
     }
 
-    public long getTime() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+    /***
+     * Get alarm/reminder time as long
+     * Alarm time <= current time: append 1 day
+     * @return reminder time as long
+     */
+    private long getAlarmTimeAsLong() {
+        SharedPreferences sharedPreferences
+                = PreferenceManager.getDefaultSharedPreferences(this);
+
+        SimpleDateFormat timeFormat
+                = new SimpleDateFormat("hh:mm", Locale.getDefault());
 
         Calendar cal = Calendar.getInstance();
 
